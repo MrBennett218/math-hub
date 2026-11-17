@@ -206,6 +206,7 @@ function render() {
     step(4, "Hands-on", "Use a math tool", "--hands", B.hands(G).map(function (h) { return item(h[0], h[1], h[2], h[3]); })),
     step(5, "Check", "Show your teacher", "--check", [
       item(B.code + " quiz", "Opens your quiz in your " + CLASS[G][0] + " Google Classroom. Use your school account.", "https://classroom.google.com/c/" + CLASS[G][1] + "/a/" + btoa(B.quiz[G]) + "/details", "Classroom \u2192"),
+      item("Wrong account?", "Quiz not found? Choose your school account, then it opens the quiz.", "https://accounts.google.com/AccountChooser?continue=" + encodeURIComponent("https://classroom.google.com/c/" + CLASS[G][1] + "/a/" + btoa(B.quiz[G]) + "/details"), "Choose \u2192"),
       item("Level 4 challenge", "Finished the quiz? Open the challenge sheet, then ask your teacher for a paper copy to write on.", "level4-" + B.code + "-grade" + G + ".pdf", "Open \u2192")
     ])
   );
