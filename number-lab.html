@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B01 Number Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* One visual world: a math notebook page. Place value colours are the only loud thing. */
+  --paper: #fbfcf8;
+  --grid: #e4ebe4;
+  --ink: #1d2a33;
+  --muted: #5d6b73;
+  --line: #c9d3cc;
+  --accent: #1f4e8c;
+  --good: #1f7a46;
+  --bad: #c0392b;
+  --p0: #1f8a5b; --p1: #2f6fd6; --p2: #d9482b; --p3: #7b45c9;
+  --p4: #b67c00; --p5: #0f8492; --p6: #b0306a;
+  --display: "Bricolage Grotesque", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", Verdana, system-ui, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.45;
+}
+.num, .mono { font-variant-numeric: tabular-nums; }
+header { padding: 18px 20px 6px; max-width: 1040px; margin: 0 auto; display: grid; gap: 12px; }
+.brand { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 5vw, 42px); margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
+h1 .chips { display: inline-flex; gap: 3px; vertical-align: middle; margin-right: 8px; }
+h1 .chips i { width: 14px; height: 34px; border-radius: 3px; display: inline-block; }
+.sub { color: var(--muted); font-size: 15px; }
+.bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+.grades, .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+button { font: inherit; cursor: pointer; }
+button:focus-visible, .slot:focus-visible, .card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.pill { border: 2px solid var(--ink); background: #fff; color: var(--ink); border-radius: 999px; padding: 6px 14px; font-weight: 700; }
+.pill[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.tab { border: 0; background: transparent; color: var(--muted); padding: 8px 12px; border-radius: 8px; font-weight: 700; border-bottom: 3px solid transparent; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); background: #fff; }
+main { max-width: 1040px; margin: 0 auto; padding: 8px 20px 40px; }
+.panel { background: #fff; border: 2px solid var(--ink); border-radius: 14px; padding: 20px; box-shadow: 6px 6px 0 var(--grid); display: grid; gap: 16px; }
+.panel h2 { font-family: var(--display); font-weight: 800; font-size: 26px; margin: 0; }
+.howto { color: var(--muted); margin: 0; max-width: 68ch; }
+.prompt { font-size: 20px; margin: 0; max-width: 68ch; }
+.prompt b { font-family: var(--display); }
+.clues { margin: 0; padding-left: 22px; display: grid; gap: 4px; font-size: 18px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.btn { border: 2px solid var(--ink); background: var(--ink); color: #fff; border-radius: 10px; padding: 9px 16px; font-weight: 700; }
+.btn.ghost { background: #fff; color: var(--ink); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.score { margin-left: auto; font-weight: 700; color: var(--muted); }
+.score b { color: var(--ink); font-family: var(--display); font-size: 20px; }
+.feedback { min-height: 28px; font-size: 18px; border-left: 5px solid transparent; padding: 6px 12px; border-radius: 4px; }
+.feedback.good { border-color: var(--good); background: #e8f4ec; }
+.feedback.bad { border-color: var(--bad); background: #fbeceb; }
+.feedback.info { border-color: var(--accent); background: #eaf0f8; }
+.scroll { overflow-x: auto; padding-bottom: 4px; }
+
+/* place value chart */
+.chart { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(64px, 1fr); gap: 0; border: 2px solid var(--ink); border-radius: 10px; overflow: hidden; min-width: max-content; }
+.col { display: grid; grid-template-rows: auto 1fr; border-left: 2px solid var(--ink); }
+.col:first-child { border-left: 0; }
+.col.gap { border-left-width: 6px; }
+.col .lab { color: #fff; font-weight: 700; font-size: 12.5px; text-align: center; padding: 5px 4px; line-height: 1.15; min-height: 42px; display: grid; place-items: center; }
+.slot { border: 0; background: #fff; font-family: var(--display); font-size: 40px; font-weight: 800; height: 72px; color: var(--ink); }
+.slot.sel { background: #fff7d6; box-shadow: inset 0 0 0 3px #e0b400; }
+.slot.right { background: #e3f3e8; }
+.slot.wrong { background: #fbe3e1; }
+.slot.empty { color: #b8c2bc; }
+.pad { display: grid; grid-template-columns: repeat(10, minmax(36px, 52px)); gap: 6px; }
+.pad button { border: 2px solid var(--ink); background: #fff; border-radius: 8px; height: 48px; font-family: var(--display); font-weight: 800; font-size: 22px; }
+.reveal { display: grid; gap: 4px; font-size: 18px; }
+.reveal .big { font-family: var(--display); font-size: 34px; font-weight: 800; }
+
+/* disks */
+.disks .col { grid-template-rows: auto 1fr auto; min-width: 104px; }
+.tray { min-height: 170px; padding: 8px 6px; display: flex; flex-wrap: wrap; align-content: flex-start; justify-content: center; gap: 4px; background: #fff; }
+.disk { width: 30px; height: 30px; border-radius: 50%; color: #fff; font-size: 9.5px; font-weight: 700; display: grid; place-items: center; box-shadow: inset 0 -3px 0 rgba(0,0,0,.18); }
+.tray.over { background: #fff4e5; }
+.ctl { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 6px; border-top: 2px solid var(--ink); background: #f6f8f5; }
+.ctl button { border: 2px solid var(--ink); background: #fff; border-radius: 6px; font-weight: 800; padding: 2px 0; }
+.ctl .wide { grid-column: span 2; font-size: 12px; font-weight: 700; min-height: 30px; line-height: 1.15; padding: 3px 2px; }
+.ctl .spacer { visibility: hidden; }
+.disks .col { min-width: 118px; }
+.count { text-align: center; font-weight: 700; font-size: 13px; color: var(--muted); grid-column: span 2; }
+
+/* number line */
+svg.nl { width: 100%; max-width: 860px; height: auto; display: block; }
+.choices { display: flex; gap: 12px; flex-wrap: wrap; }
+.choice { border: 2px solid var(--ink); background: #fff; border-radius: 12px; padding: 12px 22px; font-family: var(--display); font-weight: 800; font-size: 28px; min-width: 150px; }
+.choice.right { background: #e3f3e8; border-color: var(--good); }
+.choice.wrong { background: #fbe3e1; border-color: var(--bad); }
+
+/* cards */
+.cards { display: flex; gap: 10px; flex-wrap: wrap; }
+.card { width: 58px; height: 78px; border: 2px solid var(--ink); border-radius: 10px; background: #fff; font-family: var(--display); font-size: 36px; font-weight: 800; box-shadow: 3px 3px 0 var(--grid); }
+.card.used { visibility: hidden; }
+.target { font-family: var(--display); font-size: 30px; font-weight: 800; color: var(--accent); }
+
+/* order */
+.pool, .placed { display: flex; gap: 10px; flex-wrap: wrap; min-height: 64px; align-items: center; }
+.placed { border: 2px dashed var(--line); border-radius: 12px; padding: 10px; }
+.chip { border: 2px solid var(--ink); background: #fff; border-radius: 10px; padding: 10px 16px; font-family: var(--display); font-weight: 800; font-size: 24px; position: relative; }
+.chip .n { position: absolute; top: -10px; left: -10px; background: var(--accent); color: #fff; width: 22px; height: 22px; border-radius: 50%; font-size: 13px; display: grid; place-items: center; font-family: var(--body); }
+.chip.right { background: #e3f3e8; border-color: var(--good); }
+.chip.wrong { background: #fbe3e1; border-color: var(--bad); }
+.arrow { color: var(--muted); font-weight: 700; }
+
+footer { max-width: 1040px; margin: 0 auto; padding: 0 20px 30px; color: var(--muted); font-size: 14px; }
+@media (max-width: 520px) {
+  .slot { font-size: 30px; height: 60px; }
+  .pad { grid-template-columns: repeat(5, 1fr); }
+  .choice { font-size: 22px; min-width: 120px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pop { animation: pop .25s ease-out; }
+  @keyframes pop { from { transform: scale(.85); opacity: .3; } to { transform: scale(1); opacity: 1; } }
+  .marker { transition: transform .5s ease-out; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1><span class="chips" aria-hidden="true"><i style="background:var(--p2)"></i><i style="background:var(--p1)"></i><i style="background:var(--p0)"></i></span>B01 Number Lab</h1>
+    <span class="sub">Whole numbers: place value, estimating and comparing · Math carousel station</span>
+  </div>
+  <div class="bar">
+    <div class="grades" role="group" aria-label="Grade">
+      <button class="pill" data-grade="4" id="g4">Grade 4</button>
+      <button class="pill" data-grade="5" id="g5">Grade 5</button>
+      <button class="pill" data-grade="6" id="g6">Grade 6</button>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Games">
+      <button class="tab" role="tab" data-game="mystery" id="t-mystery">Mystery number</button>
+      <button class="tab" role="tab" data-game="disks" id="t-disks">Place value disks</button>
+      <button class="tab" role="tab" data-game="round" id="t-round">Round it</button>
+      <button class="tab" role="tab" data-game="closest" id="t-closest">Digit cards</button>
+      <button class="tab" role="tab" data-game="order" id="t-order">Order up</button>
+    </div>
+  </div>
+</header>
+<main id="main"></main>
+<footer>Tip for teachers: each game and grade has its own link. Pick a grade and game, then copy the address (it ends in something like #g5-round) to post that exact station in Classroom.</footer>
+
+<script>
+(function () {
+"use strict";
+var PLACE = ["ones", "tens", "hundreds", "thousands", "ten thousands", "hundred thousands", "millions"];
+var PCOL = ["--p0", "--p1", "--p2", "--p3", "--p4", "--p5", "--p6"];
+var GRADES = {
+  4: { digits: 4, units: [10, 100, 1000] },
+  5: { digits: 5, units: [10, 100, 1000, 10000] },
+  6: { digits: 7, units: [100, 1000, 10000, 100000, 1000000] }
+};
+var GAMES = ["mystery", "disks", "round", "closest", "order"];
+var state = { grade: 5, game: "mystery", score: {} };
+
+// ---------- helpers ----------
+function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " "); }
+var ONES = ["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
+var TENS = ["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
+function w2(n) { if (n < 20) return ONES[n]; var t = TENS[Math.floor(n / 10)], o = n % 10; return o ? t + "-" + ONES[o] : t; }
+function w3(n) { var h = Math.floor(n / 100), r = n % 100, out = []; if (h) out.push(ONES[h] + " hundred"); if (r) out.push(w2(r)); return out.join(" "); }
+function words(n) {
+  if (n === 0) return "zero";
+  var m = Math.floor(n / 1e6), th = Math.floor(n / 1000) % 1000, r = n % 1000, out = [];
+  if (m) out.push(w3(m) + " million"); if (th) out.push(w3(th) + " thousand"); if (r) out.push(w3(r));
+  return out.join(" ");
+}
+function expanded(n) {
+  var s = String(n), parts = [];
+  for (var i = 0; i < s.length; i++) { var d = +s[i]; if (d) parts.push(fmt(d * Math.pow(10, s.length - 1 - i))); }
+  return parts.join(" + ");
+}
+function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function randNum(digits) { var s = String(rnd(1, 9)); for (var i = 1; i < digits; i++) s += rnd(0, 9); return +s; }
+function placeOfUnit(u) { return PLACE[Math.round(Math.log10(u))]; }
+function el(tag, attrs, kids) {
+  var e = document.createElement(tag);
+  if (attrs) for (var k in attrs) {
+    if (k === "text") e.textContent = attrs[k];
+    else if (k === "html") e.innerHTML = attrs[k];
+    else if (k.slice(0, 2) === "on") e.addEventListener(k.slice(2), attrs[k]);
+    else e.setAttribute(k, attrs[k]);
+  }
+  (kids || []).forEach(function (c) { if (c != null) e.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+  return e;
+}
+function colour(i) { return "var(" + PCOL[i] + ")"; }
+function cfg() { return GRADES[state.grade]; }
+function bump(game) { var k = state.grade + game; state.score[k] = (state.score[k] || 0) + 1; save(); }
+function scoreEl(game) { return el("span", { class: "score" }, ["Correct: ", el("b", { class: "num", text: String(state.score[state.grade + game] || 0) })]); }
+function feedback(box, kind, msg) { box.className = "feedback " + kind; box.innerHTML = msg; }
+function chartCols(n, labelFor) {
+  // columns ordered highest place on the left
+  var cols = [];
+  for (var p = n - 1; p >= 0; p--) {
+    var c = el("div", { class: "col" + (p === 2 || p === 5 ? " gap" : "") });
+    c.appendChild(el("div", { class: "lab", style: "background:" + colour(p), text: labelFor ? labelFor(p) : PLACE[p] }));
+    cols.push({ p: p, node: c });
+  }
+  return cols;
+}
+
+// ---------- 1. Mystery number ----------
+function makeClues(n) {
+  var d = String(n).split("").reverse().map(Number); // d[p]
+  var order = shuffle(d.map(function (_, i) { return i; }));
+  var known = [], clues = [];
+  order.forEach(function (p) {
+    var rel = [];
+    known.forEach(function (q) {
+      var a = d[p], b = d[q];
+      if (a === b) rel.push("the same as my " + PLACE[q] + " digit");
+      if (a === 2 * b && b > 0) rel.push("double my " + PLACE[q] + " digit");
+      if (b === 2 * a && a > 0) rel.push("half of my " + PLACE[q] + " digit");
+      if (a - b >= 1 && a - b <= 3) rel.push((a - b === 1 ? "one" : a - b === 2 ? "two" : "three") + " more than my " + PLACE[q] + " digit");
+      if (b - a >= 1 && b - a <= 3) rel.push((b - a === 1 ? "one" : b - a === 2 ? "two" : "three") + " less than my " + PLACE[q] + " digit");
+    });
+    var text;
+    if (!known.length || !rel.length || Math.random() < 0.3) text = "My " + PLACE[p] + " digit is " + d[p] + ".";
+    else text = "My " + PLACE[p] + " digit is " + pick(rel) + ".";
+    clues.push(text); known.push(p);
+  });
+  return clues;
+}
+function gameMystery(root) {
+  var n = cfg().digits, target = randNum(n), clues = makeClues(target);
+  var vals = new Array(n).fill(null), sel = n - 1, solved = false;
+  var fb = el("div", { class: "feedback", "aria-live": "polite" });
+  var reveal = el("div", { class: "reveal" });
+  var chartWrap = el("div", { class: "scroll" });
+  function drawChart() {
+    var chart = el("div", { class: "chart" });
+    chartCols(n).forEach(function (c) {
+      var v = vals[c.p];
+      var b = el("button", { class: "slot num" + (c.p === sel ? " sel" : "") + (v === null ? " empty" : ""), id: "slot-" + c.p, "aria-label": PLACE[c.p] + " digit" + (v === null ? ", empty" : ", " + v), text: v === null ? "?" : String(v),
+        onclick: function () { sel = c.p; drawChart(); } });
+      c.node.appendChild(b); chart.appendChild(c.node);
+    });
+    chartWrap.innerHTML = ""; chartWrap.appendChild(chart);
+  }
+  function put(dg) {
+    if (solved) return;
+    vals[sel] = dg; if (sel > 0) sel--; drawChart(); fb.className = "feedback"; fb.textContent = "";
+  }
+  var pad = el("div", { class: "pad", role: "group", "aria-label": "Digits" });
+  for (var i = 0; i <= 9; i++) (function (dg) { pad.appendChild(el("button", { text: String(dg), "aria-label": "Put " + dg, onclick: function () { put(dg); } })); })(i);
+  function check() {
+    if (vals.some(function (v) { return v === null; })) { feedback(fb, "info", "Fill in every place first. Click a box to choose it."); return; }
+    var d = String(target).split("").reverse().map(Number), ok = true;
+    var slots = chartWrap.querySelectorAll(".slot");
+    for (var p = 0; p < n; p++) { var s = chartWrap.querySelector("#slot-" + p); var r = vals[p] === d[p]; s.classList.add(r ? "right" : "wrong"); if (!r) ok = false; }
+    if (ok) {
+      solved = true; bump("mystery");
+      feedback(fb, "good", "You found it! Now check the other ways to write it.");
+      reveal.innerHTML = "";
+      reveal.appendChild(el("div", { class: "big num pop", text: fmt(target) }));
+      reveal.appendChild(el("div", { class: "num" }, [el("b", { text: "Expanded form: " }), expanded(target)]));
+      reveal.appendChild(el("div", {}, [el("b", { text: "Words: " }), words(target)]));
+      root.querySelector(".score b").textContent = String(state.score[state.grade + "mystery"]);
+    } else feedback(fb, "bad", "Not yet. The red boxes don't match a clue. Reread those clues and try again.");
+  }
+  root.append(
+    el("h2", { text: "Mystery number" }),
+    el("p", { class: "howto", text: "Read the clues. Click a box in the place value chart, then pick a digit. Some clues depend on another clue, so start with the ones that tell you a digit." }),
+    el("p", { class: "prompt" }, ["I am a ", el("b", { text: n + "-digit" }), " number."]),
+    el("ol", { class: "clues" }, clues.map(function (c) { return el("li", { text: c }); })),
+    chartWrap, pad,
+    el("div", { class: "row" }, [
+      el("button", { class: "btn", text: "Check my number", onclick: check }),
+      el("button", { class: "btn ghost", text: "New mystery", onclick: render }), scoreEl("mystery")]),
+    fb, reveal);
+  drawChart();
+  root._key = function (e) { if (/^[0-9]$/.test(e.key)) { put(+e.key); e.preventDefault(); } else if (e.key === "ArrowLeft" && sel < n - 1) { sel++; drawChart(); } else if (e.key === "ArrowRight" && sel > 0) { sel--; drawChart(); } };
+}
+
+// ---------- 2. Place value disks ----------
+function gameDisks(root) {
+  var n = cfg().digits, target = randNum(n), counts = new Array(n).fill(0);
+  var askWords = Math.random() < 0.5;
+  var show = false;
+  var fb = el("div", { class: "feedback", "aria-live": "polite" });
+  var wrap = el("div", { class: "scroll" });
+  var readout = el("div", { class: "reveal" });
+  function value() { return counts.reduce(function (s, c, p) { return s + c * Math.pow(10, p); }, 0); }
+  function label(p) { var v = Math.pow(10, p); return v >= 1e6 ? "1M" : v >= 1000 ? (v / 1000) + "K" : String(v); }
+  function draw() {
+    var chart = el("div", { class: "chart disks" });
+    chartCols(n).forEach(function (c) {
+      var p = c.p, tray = el("div", { class: "tray" + (counts[p] > 9 ? " over" : "") });
+      for (var k = 0; k < Math.min(counts[p], 24); k++) tray.appendChild(el("span", { class: "disk", style: "background:" + colour(p), text: label(p) }));
+      if (counts[p] > 24) tray.appendChild(el("span", { class: "count", text: "+" + (counts[p] - 24) + " more" }));
+      var ctl = el("div", { class: "ctl" }, [
+        el("button", { text: "+", "aria-label": "Add a " + label(p) + " disk", onclick: function () { if (counts[p] < 30) counts[p]++; draw(); } }),
+        el("button", { text: "−", "aria-label": "Remove a " + label(p) + " disk", onclick: function () { if (counts[p] > 0) counts[p]--; draw(); } }),
+        el("span", { class: "count num", text: counts[p] + " × " + fmt(Math.pow(10, p)) }),
+        p < n - 1 ? el("button", { class: "wide", text: "Trade 10 for one " + fmt(Math.pow(10, p + 1)), disabled: counts[p] < 10 ? "" : null, onclick: function () { counts[p] -= 10; counts[p + 1]++; draw(); } }) : el("span", { class: "wide spacer" }),
+        p > 0 ? el("button", { class: "wide", text: "Break into 10 × " + fmt(Math.pow(10, p - 1)), disabled: counts[p] < 1 ? "" : null, onclick: function () { counts[p]--; counts[p - 1] += 10; draw(); } }) : el("span", { class: "wide spacer" })
+      ]);
+      // remove disabled attr when null
+      ctl.querySelectorAll("button").forEach(function (b) { if (b.getAttribute("disabled") === "null") b.removeAttribute("disabled"); });
+      c.node.append(tray, ctl); chart.appendChild(c.node);
+    });
+    wrap.innerHTML = ""; wrap.appendChild(chart);
+    readout.innerHTML = "";
+    if (show) {
+      var v = value();
+      readout.append(el("div", { class: "num" }, [el("b", { text: "Your disks show: " }), el("span", { class: "big num", text: fmt(v) })]));
+    }
+  }
+  function check() {
+    var v = value();
+    if (v === target) {
+      var messy = counts.some(function (c) { return c > 9; });
+      bump("disks");
+      root.querySelector(".score b").textContent = String(state.score[state.grade + "disks"]);
+      feedback(fb, "good", messy ? "Correct value: " + fmt(target) + "! One column has 10 or more disks. Can you trade to show it with the fewest disks?" : "Correct! " + fmt(target) + " = " + expanded(target) + ".");
+    } else feedback(fb, "bad", "Not yet. Your disks are worth " + (show ? fmt(v) : "a different amount") + ". " + (v > target ? "That's too much." : "That's not enough."));
+  }
+  var target_text = askWords ? words(target) : expanded(target);
+  root.append(
+    el("h2", { text: "Place value disks" }),
+    el("p", { class: "howto", text: "Build the number with disks. Use + and − to add or take away disks. Use Trade and Break to regroup, just like with real base ten materials." }),
+    el("p", { class: "prompt" }, ["Build: ", el("b", { class: "num", text: target_text })]),
+    wrap,
+    el("div", { class: "row" }, [
+      el("button", { class: "btn", text: "Check", onclick: check }),
+      el("button", { class: "btn ghost", id: "showbtn", text: "Show my number", onclick: function (e) { show = !show; e.target.textContent = show ? "Hide my number" : "Show my number"; draw(); } }),
+      el("button", { class: "btn ghost", text: "Clear disks", onclick: function () { counts.fill(0); draw(); fb.className = "feedback"; fb.textContent = ""; } }),
+      el("button", { class: "btn ghost", text: "New number", onclick: render }), scoreEl("disks")]),
+    readout, fb);
+  draw();
+}
+
+// ---------- 3. Round it ----------
+function gameRound(root) {
+  var c = cfg(), u = pick(c.units), n;
+  do { n = randNum(c.digits); } while (n % u === 0 || n < u);
+  var lo = Math.floor(n / u) * u, hi = lo + u, ans = (n - lo) * 2 >= u ? hi : lo;
+  var answered = false, hintShown = false;
+  var fb = el("div", { class: "feedback", "aria-live": "polite" });
+  var W = 860, H = 150, L = 50, R = 810;
+  function x(v) { return L + (v - lo) / u * (R - L); }
+  var svg = '<svg class="nl" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Number line from ' + fmt(lo) + ' to ' + fmt(hi) + '">';
+  svg += '<line x1="' + L + '" y1="80" x2="' + R + '" y2="80" stroke="#1d2a33" stroke-width="3"/>';
+  for (var i = 0; i <= 10; i++) {
+    var xx = L + i * (R - L) / 10, big = i === 0 || i === 10, mid = i === 5;
+    svg += '<line x1="' + xx + '" y1="' + (big ? 62 : mid ? 66 : 72) + '" x2="' + xx + '" y2="' + (big ? 98 : mid ? 94 : 88) + '" stroke="' + (mid ? "#1f4e8c" : "#1d2a33") + '" stroke-width="' + (big || mid ? 3 : 2) + '"/>';
+  }
+  svg += '<text x="' + L + '" y="126" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="22" fill="#1d2a33">' + fmt(lo) + '</text>';
+  svg += '<text x="' + R + '" y="126" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="22" fill="#1d2a33">' + fmt(hi) + '</text>';
+  svg += '<text x="' + ((L + R) / 2) + '" y="126" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-size="17" fill="#1f4e8c">halfway ' + fmt(lo + u / 2) + '</text>';
+  svg += '<g class="marker" id="mk" style="transform:translate(' + x(n) + 'px,0);opacity:0"><circle cx="0" cy="80" r="9" fill="#d9482b"/><text x="0" y="44" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="20" fill="#d9482b">' + fmt(n) + '</text></g>';
+  svg += '</svg>';
+  var line = el("div", { class: "scroll", html: svg });
+  function showMarker() { var m = line.querySelector("#mk"); m.style.opacity = "1"; }
+  var lowerPlace = placeOfUnit(u / 10), dig = Math.floor(n / (u / 10)) % 10;
+  var choices = el("div", { class: "choices" });
+  shuffle([lo, hi]).forEach(function (v) {
+    choices.appendChild(el("button", { class: "choice num", text: fmt(v), onclick: function (e) {
+      if (answered) return; answered = true; showMarker();
+      var ok = v === ans;
+      e.target.classList.add(ok ? "right" : "wrong");
+      if (!ok) choices.querySelectorAll(".choice").forEach(function (b) { if (b.textContent === fmt(ans)) b.classList.add("right"); });
+      var why = "Look at the " + lowerPlace + " digit: it is " + dig + ", so round " + (dig >= 5 ? "up" : "down") + " to " + fmt(ans) + ".";
+      if (ok && !hintShown) bump("round");
+      if (ok) root.querySelector(".score b").textContent = String(state.score[state.grade + "round"] || 0);
+      feedback(fb, ok ? "good" : "bad", (ok ? "Correct! " : "Not quite. ") + why);
+    } }));
+  });
+  root.append(
+    el("h2", { text: "Round it" }),
+    el("p", { class: "howto", text: "Decide which end of the number line the number is closer to. Use the hint only if you need it (hints don't add to your score)." }),
+    el("p", { class: "prompt" }, ["Round ", el("b", { class: "num", text: fmt(n) }), " to the nearest ", el("b", { text: placeOfUnit(u).replace(/s$/, "") }), "."]),
+    line, choices,
+    el("div", { class: "row" }, [
+      el("button", { class: "btn ghost", text: "Hint: show it on the line", onclick: function () { hintShown = true; showMarker(); } }),
+      el("button", { class: "btn", text: "Next number", onclick: render }), scoreEl("round")]),
+    fb);
+}
+
+// ---------- 4. Digit cards ----------
+function perms(arr) {
+  if (arr.length <= 1) return [arr];
+  var out = [];
+  arr.forEach(function (v, i) { var rest = arr.slice(0, i).concat(arr.slice(i + 1)); perms(rest).forEach(function (p) { out.push([v].concat(p)); }); });
+  return out;
+}
+function gameClosest(root) {
+  var n = cfg().digits;
+  var digits = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]).slice(0, n);
+  var mode = pick(["closest", "closest", "greatest", "least", "less"]);
+  var lead = rnd(2, 8), tgt = lead * Math.pow(10, n - 1);
+  if (mode === "closest" && Math.random() < 0.6 && digits.indexOf(lead) !== -1 && digits.indexOf(0) === -1) {
+    // make it trickier: remove the target's lead digit from the cards
+    var spare = [0,1,2,3,4,5,6,7,8,9].filter(function (d) { return digits.indexOf(d) === -1 && d !== lead; });
+    digits[digits.indexOf(lead)] = pick(spare);
+  }
+  var all = perms(digits).filter(function (p) { return p[0] !== 0; }).map(function (p) { return +p.join(""); });
+  var best, goal;
+  if (mode === "greatest") { best = Math.max.apply(null, all); goal = "Make the greatest number you can."; }
+  else if (mode === "least") { best = Math.min.apply(null, all); goal = "Make the least number you can."; }
+  else if (mode === "less") { var under = all.filter(function (v) { return v < tgt; }); if (!under.length) { mode = "closest"; } else { best = Math.max.apply(null, under); goal = "Make the greatest number that is less than " + fmt(tgt) + "."; } }
+  if (mode === "closest") { best = all.reduce(function (b, v) { return Math.abs(v - tgt) < Math.abs(b - tgt) ? v : b; }, all[0]); goal = "Make the number that is as close as possible to " + fmt(tgt) + "."; }
+  var slots = new Array(n).fill(null); // indices into digits
+  var used = new Array(n).fill(false), done = false;
+  var fb = el("div", { class: "feedback", "aria-live": "polite" });
+  var cardRow = el("div", { class: "cards" }), slotWrap = el("div", { class: "scroll" });
+  function draw() {
+    cardRow.innerHTML = "";
+    digits.forEach(function (d, i) {
+      cardRow.appendChild(el("button", { class: "card num" + (used[i] ? " used" : ""), text: String(d), "aria-label": "Card " + d, onclick: function () {
+        if (done) return; var k = slots.indexOf(null); if (k === -1) return; slots[k] = i; used[i] = true; draw(); } }));
+    });
+    var chart = el("div", { class: "chart" });
+    chartCols(n).forEach(function (c, idx) {
+      var s = slots[idx];
+      c.node.appendChild(el("button", { class: "slot num" + (s === null ? " empty" : ""), text: s === null ? "_" : String(digits[s]), "aria-label": PLACE[c.p] + (s === null ? " empty" : ", " + digits[s] + ". Click to take the card back"), onclick: function () {
+        if (done || s === null) return; used[s] = false; slots[idx] = null; draw(); } }));
+      chart.appendChild(c.node);
+    });
+    slotWrap.innerHTML = ""; slotWrap.appendChild(chart);
+  }
+  function check() {
+    if (slots.indexOf(null) !== -1) { feedback(fb, "info", "Use every card once."); return; }
+    if (digits[slots[0]] === 0) { feedback(fb, "bad", "A number can't start with 0. Move the 0 to another place."); return; }
+    var v = +slots.map(function (i) { return digits[i]; }).join("");
+    var ok;
+    if (mode === "closest") ok = Math.abs(v - tgt) === Math.abs(best - tgt); else ok = v === best;
+    if (mode === "less" && v >= tgt) { feedback(fb, "bad", fmt(v) + " is not less than " + fmt(tgt) + ". Try again."); return; }
+    done = true;
+    if (ok) { bump("closest"); root.querySelector(".score b").textContent = String(state.score[state.grade + "closest"]); }
+    var msg = ok ? "Correct! " + fmt(v) + " is the best you can make." : "Good try. " + fmt(v) + " works, but " + fmt(best) + " is better.";
+    if (mode === "closest") msg += " " + fmt(v) + " is " + fmt(Math.abs(v - tgt)) + " away from " + fmt(tgt) + (ok ? "." : "; " + fmt(best) + " is only " + fmt(Math.abs(best - tgt)) + " away.");
+    msg += " Can you explain why no other number is " + (mode === "closest" ? "closer" : "better") + "?";
+    feedback(fb, ok ? "good" : "bad", msg);
+  }
+  root.append(
+    el("h2", { text: "Digit cards" }),
+    el("p", { class: "howto", text: "Click the cards to place them from the biggest place to the smallest. Click a box to take its card back. Use every card once." }),
+    el("p", { class: "prompt" }, [el("b", { text: goal })]),
+    cardRow, slotWrap,
+    el("div", { class: "row" }, [
+      el("button", { class: "btn", text: "Check", onclick: check }),
+      el("button", { class: "btn ghost", text: "Start over", onclick: function () { if (done) return; slots.fill(null); used.fill(false); draw(); fb.className = "feedback"; fb.textContent = ""; } }),
+      el("button", { class: "btn ghost", text: "New cards", onclick: render }), scoreEl("closest")]),
+    fb);
+  draw();
+}
+
+// ---------- 5. Order up ----------
+function gameOrder(root) {
+  var n = cfg().digits, base = randNum(n), nums = [base];
+  while (nums.length < 4) {
+    var s = String(base).split(""), a = rnd(1, n - 1), b = rnd(1, n - 1);
+    s[a] = String(rnd(0, 9)); if (Math.random() < 0.6) s[b] = String(rnd(0, 9));
+    if (Math.random() < 0.3) { var t = s[a]; s[a] = s[b]; s[b] = t; }
+    var v = +s.join(""); if (nums.indexOf(v) === -1 && String(v).length === n) nums.push(v);
+  }
+  nums = shuffle(nums);
+  var asc = Math.random() < 0.6, placed = [], done = false;
+  var correct = nums.slice().sort(function (x, y) { return asc ? x - y : y - x; });
+  var fb = el("div", { class: "feedback", "aria-live": "polite" });
+  var pool = el("div", { class: "pool" }), row = el("div", { class: "placed", "aria-label": "Your order" });
+  function draw() {
+    pool.innerHTML = ""; row.innerHTML = "";
+    nums.forEach(function (v) { if (placed.indexOf(v) === -1) pool.appendChild(el("button", { class: "chip num", text: fmt(v), onclick: function () { if (done) return; placed.push(v); draw(); if (placed.length === nums.length) check(); } })); });
+    if (!placed.length) row.appendChild(el("span", { class: "arrow", text: "Click the numbers in order. They will line up here." }));
+    placed.forEach(function (v, i) {
+      if (i) row.appendChild(el("span", { class: "arrow", text: asc ? "<" : ">" }));
+      var cls = "chip num" + (done ? (v === correct[i] ? " right" : " wrong") : "");
+      row.appendChild(el("button", { class: cls, onclick: function () { if (done) return; placed.splice(placed.indexOf(v), 1); draw(); } }, [el("span", { class: "n", text: String(i + 1) }), fmt(v)]));
+    });
+  }
+  function check() {
+    done = true; draw();
+    var ok = placed.every(function (v, i) { return v === correct[i]; });
+    if (ok) { bump("order"); root.querySelector(".score b").textContent = String(state.score[state.grade + "order"]); feedback(fb, "good", "Correct! Compare from the biggest place: when the digits match, move one place to the right."); }
+    else feedback(fb, "bad", "Not quite. The correct order is " + correct.map(fmt).join(asc ? " < " : " > ") + ". Find the first place where the digits are different.");
+  }
+  root.append(
+    el("h2", { text: "Order up" }),
+    el("p", { class: "howto", text: "Click the numbers in order. Click a number in your row to take it back before you finish." }),
+    el("p", { class: "prompt" }, ["Put these numbers in order from ", el("b", { text: asc ? "least to greatest" : "greatest to least" }), "."]),
+    pool, row,
+    el("div", { class: "row" }, [el("button", { class: "btn", text: "New numbers", onclick: render }), scoreEl("order")]),
+    fb);
+  draw();
+}
+
+// ---------- shell ----------
+var DRAW = { mystery: gameMystery, disks: gameDisks, round: gameRound, closest: gameClosest, order: gameOrder };
+var main = document.getElementById("main");
+function render() {
+  document.querySelectorAll("[data-grade]").forEach(function (b) { b.setAttribute("aria-pressed", String(+b.dataset.grade === state.grade)); });
+  document.querySelectorAll("[data-game]").forEach(function (b) { b.setAttribute("aria-selected", String(b.dataset.game === state.game)); });
+  main.innerHTML = "";
+  var panel = el("section", { class: "panel", role: "tabpanel", "aria-labelledby": "t-" + state.game });
+  main.appendChild(panel);
+  DRAW[state.game](panel);
+  var h = "g" + state.grade + "-" + state.game;
+  if (location.hash.slice(1) !== h) { try { history.replaceState(null, "", "#" + h); } catch (e) { location.hash = h; } }
+}
+function save() { /* scores live in memory for this visit */ }
+function fromHash() {
+  var m = /^#g([456])-([a-z]+)$/.exec(location.hash);
+  if (m && GAMES.indexOf(m[2]) !== -1) { state.grade = +m[1]; state.game = m[2]; return true; }
+  return false;
+}
+document.querySelectorAll("[data-grade]").forEach(function (b) { b.addEventListener("click", function () { state.grade = +b.dataset.grade; render(); }); });
+document.querySelectorAll("[data-game]").forEach(function (b) { b.addEventListener("click", function () { state.game = b.dataset.game; render(); }); });
+window.addEventListener("hashchange", function () { if (fromHash()) render(); });
+document.addEventListener("keydown", function (e) { var p = main.querySelector(".panel"); if (p && p._key && !e.target.closest("input,textarea")) p._key(e); });
+function start(data) {
+  if (data && data.grade) { state.grade = data.grade; state.game = data.game || state.game; state.score = data.score || {}; }
+  fromHash();
+  render();
+}
+if (window.claude && window.claude.hot) {
+  try { window.claude.hot.snapshot(function () { return { grade: state.grade, game: state.game, score: state.score }; }); } catch (e) {}
+}
+window.claude && window.claude.hot && window.claude.hot.ready ? window.claude.hot.ready(start) : start((window.claude && window.claude.hot && window.claude.hot.data) || {});
+// expose for testing
+window.__lab = { words: words, expanded: expanded, fmt: fmt, makeClues: makeClues, perms: perms };
+})();
+</script>
+</body>
+</html>

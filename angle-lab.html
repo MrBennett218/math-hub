@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Angle Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Same notebook world as Number Lab; angle arcs carry the colour. */
+  --paper: #fbfcf8; --grid: #e4ebe4; --ink: #1d2a33; --muted: #5d6b73; --line: #c9d3cc;
+  --accent: #1f4e8c; --good: #1f7a46; --bad: #c0392b;
+  --arc: #d9482b; --arc2: #2f6fd6; --arc3: #1f8a5b; --prot: #7b45c9;
+  --display: "Bricolage Grotesque", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", Verdana, system-ui, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background-color: var(--paper); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 24px 24px; color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.45; }
+header { padding: 18px 20px 6px; max-width: 1040px; margin: 0 auto; display: grid; gap: 12px; }
+.brand { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 5vw, 42px); margin: 0; letter-spacing: -0.02em; }
+h1 svg { vertical-align: -6px; margin-right: 8px; }
+.sub { color: var(--muted); font-size: 15px; }
+.bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+.grades, .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+button { font: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible, svg:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.pill { border: 2px solid var(--ink); background: #fff; color: var(--ink); border-radius: 999px; padding: 6px 14px; font-weight: 700; }
+.pill[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.tab { border: 0; background: transparent; color: var(--muted); padding: 8px 12px; border-radius: 8px; font-weight: 700; border-bottom: 3px solid transparent; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); background: #fff; }
+main { max-width: 1040px; margin: 0 auto; padding: 8px 20px 40px; }
+.panel { background: #fff; border: 2px solid var(--ink); border-radius: 14px; padding: 20px; box-shadow: 6px 6px 0 var(--grid); display: grid; gap: 14px; }
+.panel h2 { font-family: var(--display); font-weight: 800; font-size: 26px; margin: 0; }
+.howto { color: var(--muted); margin: 0; max-width: 68ch; }
+.prompt { font-size: 20px; margin: 0; }
+.prompt b { font-family: var(--display); }
+.stage { display: grid; justify-items: center; }
+svg.fig { width: 100%; max-width: 520px; height: auto; display: block; touch-action: none; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.btn { border: 2px solid var(--ink); background: var(--ink); color: #fff; border-radius: 10px; padding: 9px 16px; font-weight: 700; }
+.btn.ghost { background: #fff; color: var(--ink); }
+.score { margin-left: auto; font-weight: 700; color: var(--muted); }
+.score b { color: var(--ink); font-family: var(--display); font-size: 20px; }
+.feedback { min-height: 28px; font-size: 18px; border-left: 5px solid transparent; padding: 6px 12px; border-radius: 4px; }
+.feedback.good { border-color: var(--good); background: #e8f4ec; }
+.feedback.bad { border-color: var(--bad); background: #fbeceb; }
+.feedback.info { border-color: var(--accent); background: #eaf0f8; }
+.choices { display: flex; gap: 10px; flex-wrap: wrap; }
+.choice { border: 2px solid var(--ink); background: #fff; border-radius: 12px; padding: 10px 18px; font-family: var(--display); font-weight: 800; font-size: 22px; min-width: 110px; }
+.choice.right { background: #e3f3e8; border-color: var(--good); }
+.choice.wrong { background: #fbe3e1; border-color: var(--bad); }
+.ans { display: flex; align-items: center; gap: 6px; font-family: var(--display); font-weight: 800; font-size: 24px; }
+.ans input { width: 110px; font: inherit; border: 2px solid var(--ink); border-radius: 10px; padding: 6px 10px; text-align: right; }
+.toggle { display: inline-flex; gap: 6px; align-items: center; font-weight: 700; }
+footer { max-width: 1040px; margin: 0 auto; padding: 0 20px 30px; color: var(--muted); font-size: 14px; }
+@media (max-width: 520px) { .choice { font-size: 18px; min-width: 90px; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1><svg width="40" height="34" viewBox="0 0 40 34" aria-hidden="true"><path d="M4 30 H38" stroke="#1d2a33" stroke-width="4" stroke-linecap="round"/><path d="M4 30 L30 4" stroke="#1d2a33" stroke-width="4" stroke-linecap="round"/><path d="M18 30 A14 14 0 0 0 14 20" fill="none" stroke="#d9482b" stroke-width="4"/></svg>Angle Lab</h1>
+    <span class="sub">Angles · Math carousel station</span>
+  </div>
+  <div class="bar">
+    <div class="grades" role="group" aria-label="Grade">
+      <button class="pill" data-grade="4" id="g4">Grade 4</button>
+      <button class="pill" data-grade="5" id="g5">Grade 5</button>
+      <button class="pill" data-grade="6" id="g6">Grade 6</button>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Games">
+      <button class="tab" role="tab" data-game="name" id="t-name">Name it</button>
+      <button class="tab" role="tab" data-game="estimate" id="t-estimate">Estimate it</button>
+      <button class="tab" role="tab" data-game="measure" id="t-measure">Read the protractor</button>
+      <button class="tab" role="tab" data-game="build" id="t-build">Build it</button>
+      <button class="tab" role="tab" data-game="missing" id="t-missing">Missing angle</button>
+    </div>
+  </div>
+</header>
+<main id="main"></main>
+<footer>Tip for teachers: each game and grade has its own link, like #g5-measure. Pick a grade and game, then copy the address.</footer>
+<script>
+(function () {
+"use strict";
+var GAMES = ["name", "estimate", "measure", "build", "missing"];
+var state = { grade: 5, game: "name", score: {} };
+var NS = "http://www.w3.org/2000/svg";
+var C = { ink: "#1d2a33", arc: "#d9482b", arc2: "#2f6fd6", arc3: "#1f8a5b", prot: "#7b45c9", muted: "#5d6b73" };
+
+// ---------- helpers ----------
+function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function norm(a) { return ((a % 360) + 360) % 360; }
+function el(tag, attrs, kids) {
+  var e = document.createElement(tag);
+  for (var k in attrs || {}) { if (k === "text") e.textContent = attrs[k]; else if (k.slice(0, 2) === "on") e.addEventListener(k.slice(2), attrs[k]); else e.setAttribute(k, attrs[k]); }
+  (kids || []).forEach(function (c) { if (c != null) e.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+  return e;
+}
+function s(tag, attrs, text) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; }
+function P(cx, cy, r, deg) { var t = deg * Math.PI / 180; return [cx + r * Math.cos(t), cy - r * Math.sin(t)]; }
+function svgBox(w, h) { return s("svg", { class: "fig", viewBox: "0 0 " + w + " " + h, role: "img" }); }
+function ray(g, cx, cy, deg, len, col) { var p = P(cx, cy, len, deg); g.appendChild(s("line", { x1: cx, y1: cy, x2: p[0], y2: p[1], stroke: col || C.ink, "stroke-width": 4, "stroke-linecap": "round" })); }
+function arc(g, cx, cy, r, from, to, col, width) {
+  var sweep = norm(to - from); if (sweep === 0) return;
+  if (sweep >= 359.9) { g.appendChild(s("circle", { cx: cx, cy: cy, r: r, fill: "none", stroke: col, "stroke-width": width || 3 })); return; }
+  var a = P(cx, cy, r, from), b = P(cx, cy, r, to);
+  g.appendChild(s("path", { d: "M" + a[0] + " " + a[1] + " A" + r + " " + r + " 0 " + (sweep > 180 ? 1 : 0) + " 0 " + b[0] + " " + b[1], fill: "none", stroke: col, "stroke-width": width || 3 }));
+}
+function rightMark(g, cx, cy, base, size, col) {
+  var a = P(cx, cy, size, base), b = P(cx, cy, size * Math.SQRT2, base + 45), c = P(cx, cy, size, base + 90);
+  g.appendChild(s("path", { d: "M" + a[0] + " " + a[1] + " L" + b[0] + " " + b[1] + " L" + c[0] + " " + c[1], fill: "none", stroke: col, "stroke-width": 3 }));
+}
+function label(g, cx, cy, r, deg, text, col) { var p = P(cx, cy, r, deg); g.appendChild(s("text", { x: p[0], y: p[1] + 7, "text-anchor": "middle", "font-family": "Bricolage Grotesque, sans-serif", "font-weight": 800, "font-size": 20, fill: col || C.ink }, text)); }
+function dot(g, cx, cy) { g.appendChild(s("circle", { cx: cx, cy: cy, r: 5, fill: C.ink })); }
+function protractor(g, cx, cy, R, full) {
+  var col = C.prot;
+  if (full) g.appendChild(s("circle", { cx: cx, cy: cy, r: R, fill: "rgba(123,69,201,0.06)", stroke: col, "stroke-width": 2 }));
+  else { var a = P(cx, cy, R, 0), b = P(cx, cy, R, 180); g.appendChild(s("path", { d: "M" + a[0] + " " + a[1] + " A" + R + " " + R + " 0 0 0 " + b[0] + " " + b[1] + " Z", fill: "rgba(123,69,201,0.06)", stroke: col, "stroke-width": 2 })); }
+  var max = full ? 355 : 180;
+  for (var d = 0; d <= max; d += 5) {
+    var len = d % 10 === 0 ? 14 : 7, p1 = P(cx, cy, R, d), p2 = P(cx, cy, R - len, d);
+    g.appendChild(s("line", { x1: p1[0], y1: p1[1], x2: p2[0], y2: p2[1], stroke: col, "stroke-width": d % 10 === 0 ? 2 : 1 }));
+    if (d % 10 === 0 && !(full && d === 360)) {
+      if (full) { var q = P(cx, cy, R - 26, d); g.appendChild(s("text", { x: q[0], y: q[1] + 4, "text-anchor": "middle", "font-size": 11, fill: col, "font-family": "Atkinson Hyperlegible, sans-serif" }, String(d))); }
+      else {
+        var lift = (d === 0 || d === 180) ? -12 : 0, q1 = P(cx, cy, R - 26, d), q2 = P(cx, cy, R - 44, d); q1[1] += lift; q2[1] += lift;
+        g.appendChild(s("text", { x: q1[0], y: q1[1] + 4, "text-anchor": "middle", "font-size": 11, fill: col, "font-family": "Atkinson Hyperlegible, sans-serif" }, String(180 - d)));
+        g.appendChild(s("text", { x: q2[0], y: q2[1] + 4, "text-anchor": "middle", "font-size": 11, fill: C.muted, "font-family": "Atkinson Hyperlegible, sans-serif" }, String(d)));
+      }
+    }
+  }
+  if (!full) g.appendChild(s("line", { x1: cx - R, y1: cy, x2: cx + R, y2: cy, stroke: col, "stroke-width": 2 }));
+}
+function typeOf(d) { return d < 90 ? "acute" : d === 90 ? "right" : d < 180 ? "obtuse" : d === 180 ? "straight" : "reflex"; }
+function bump(game) { var k = state.grade + game; state.score[k] = (state.score[k] || 0) + 1; var b = document.querySelector(".score b"); if (b) b.textContent = String(state.score[k]); }
+function scoreEl(game) { return el("span", { class: "score" }, ["Correct: ", el("b", { text: String(state.score[state.grade + game] || 0) })]); }
+function fb(box, kind, msg) { box.className = "feedback " + kind; box.textContent = msg; }
+function answerBox(onCheck) {
+  var inp = el("input", { type: "number", inputmode: "numeric", min: "0", max: "360", id: "ans", "aria-label": "Your answer in degrees" });
+  inp.addEventListener("keydown", function (e) { if (e.key === "Enter") onCheck(); });
+  return { node: el("label", { class: "ans", for: "ans" }, [inp, "°"]), input: inp };
+}
+
+// ---------- 1. Name it ----------
+function gameName(root) {
+  var G = state.grade, types = G === 6 ? ["acute", "right", "obtuse", "straight", "reflex"] : ["acute", "right", "obtuse", "straight"];
+  var t = pick(types), d = t === "acute" ? rnd(2, 17) * 5 : t === "right" ? 90 : t === "obtuse" ? rnd(19, 34) * 5 : t === "straight" ? 180 : rnd(38, 68) * 5;
+  var rot = rnd(0, 23) * 15, svg = svgBox(400, 300), g = s("g", {}); svg.appendChild(g);
+  var cx = 200, cy = 150; ray(g, cx, cy, rot, 130); ray(g, cx, cy, rot + d, 130); arc(g, cx, cy, 34, rot, rot + d, C.arc, 4); dot(g, cx, cy);
+  svg.setAttribute("aria-label", "An angle marked with a red arc");
+  var box = el("div", { class: "feedback", "aria-live": "polite" }), done = false, choices = el("div", { class: "choices" });
+  types.forEach(function (ty) {
+    choices.appendChild(el("button", { class: "choice", text: ty, onclick: function (e) {
+      if (done) return; done = true; var ok = ty === t;
+      e.target.classList.add(ok ? "right" : "wrong");
+      if (!ok) choices.querySelectorAll(".choice").forEach(function (b) { if (b.textContent === t) b.classList.add("right"); });
+      if (ok) bump("name");
+      var why = { acute: "less than a right angle (less than 90°)", right: "exactly a quarter turn (90°)", obtuse: "more than a right angle but less than a straight angle (between 90° and 180°)", straight: "a straight line (180°)", reflex: "more than a straight angle (more than 180°)" }[t];
+      fb(box, ok ? "good" : "bad", (ok ? "Correct! " : "Not quite. ") + "This angle is " + t + ": it is " + why + ". It measures " + d + "°.");
+    } }));
+  });
+  root.append(el("h2", { text: "Name it" }), el("p", { class: "howto", text: "Look at the angle marked by the red arc. Compare it to a right angle (a square corner) and a straight line." }),
+    el("p", { class: "prompt" }, ["What kind of angle is this?"]), el("div", { class: "stage" }, [svg]), choices,
+    el("div", { class: "row" }, [el("button", { class: "btn", text: "Next angle", onclick: render }), scoreEl("name")]), box);
+}
+
+// ---------- 2. Estimate it ----------
+function gameEstimate(root) {
+  var G = state.grade, step = G === 4 ? 45 : G === 5 ? 10 : 10, max = G === 6 ? 350 : 180;
+  var d = G === 4 ? pick([45, 90, 135, 180]) : rnd(2, max / 10 - 1) * 10;
+  var opts = [d], gap = G === 4 ? 45 : 30;
+  while (opts.length < 4) { var o = d + pick([-3, -2, -1, 1, 2, 3]) * gap; if (o > 0 && o <= max && opts.indexOf(o) === -1) opts.push(o); }
+  opts.sort(function (a, b) { return a - b; });
+  var rot = rnd(0, 23) * 15, svg = svgBox(400, 300), g = s("g", {}); svg.appendChild(g);
+  var cx = 200, cy = 150; ray(g, cx, cy, rot, 130); ray(g, cx, cy, rot + d, 130); arc(g, cx, cy, 36, rot, rot + d, C.arc, 4); dot(g, cx, cy);
+  svg.setAttribute("aria-label", "An angle to estimate");
+  var box = el("div", { class: "feedback", "aria-live": "polite" }), done = false, choices = el("div", { class: "choices" });
+  opts.forEach(function (o) {
+    choices.appendChild(el("button", { class: "choice", text: o + "°", onclick: function (e) {
+      if (done) return; done = true; var ok = o === d;
+      e.target.classList.add(ok ? "right" : "wrong");
+      if (!ok) choices.querySelectorAll(".choice").forEach(function (b) { if (b.textContent === d + "°") b.classList.add("right"); });
+      if (ok) bump("estimate");
+      var bench = d < 90 ? "less than a right angle" : d === 90 ? "a right angle" : d < 180 ? "between a right angle and a straight angle" : d === 180 ? "a straight angle" : "more than a straight angle";
+      fb(box, ok ? "good" : "bad", (ok ? "Good estimate! " : "Not quite. ") + "The angle is " + d + "°, which is " + bench + ". Use 90° and 180° as benchmarks.");
+    } }));
+  });
+  root.append(el("h2", { text: "Estimate it" }), el("p", { class: "howto", text: "No protractor! Compare the angle to benchmarks: a right angle is 90°, half a right angle is 45° and a straight line is 180°." }),
+    el("p", { class: "prompt" }, ["About how big is this angle?"]), el("div", { class: "stage" }, [svg]), choices,
+    el("div", { class: "row" }, [el("button", { class: "btn", text: "Next angle", onclick: render }), scoreEl("estimate")]), box);
+}
+
+// ---------- 3. Read the protractor ----------
+function gameMeasure(root) {
+  var G = state.grade, stepD = G === 4 ? 10 : 5;
+  var phi = rnd(2, 180 / stepD - 2) * stepD, left = Math.random() < 0.5, reflex = G === 6 && Math.random() < 0.4;
+  var inner = left ? 180 - phi : phi; // the marked non-reflex angle
+  var ans = reflex ? 360 - inner : inner;
+  var cx = 250, cy = 230, R = 190, svg = svgBox(500, 270), g = s("g", {}); svg.appendChild(g);
+  svg.setAttribute("viewBox", reflex ? "0 0 500 470" : "0 0 500 270");
+  protractor(g, cx, cy, R, false);
+  var base = left ? 180 : 0;
+  ray(g, cx, cy, base, R + 10, C.ink); ray(g, cx, cy, phi, R + 10, C.ink);
+  if (reflex) { if (left) arc(g, cx, cy, 40, 180, phi + 360, C.arc, 4); else arc(g, cx, cy, 40, phi, 360, C.arc, 4); }
+  else { if (left) arc(g, cx, cy, 40, phi, 180, C.arc, 4); else arc(g, cx, cy, 40, 0, phi, C.arc, 4); }
+  dot(g, cx, cy);
+  svg.setAttribute("aria-label", "An angle on a protractor");
+  var box = el("div", { class: "feedback", "aria-live": "polite" }), done = false;
+  var a = answerBox(check);
+  function check() {
+    if (done) return; var v = +a.input.value; if (a.input.value === "") { fb(box, "info", "Type the measure in degrees."); return; }
+    done = true;
+    if (v === ans) { bump("measure"); fb(box, "good", "Correct! The angle measures " + ans + "°."); }
+    else if (!reflex && v === 180 - ans) fb(box, "bad", "You read the other scale. Start at the 0 on the arm the angle starts from, then count up. The answer is " + ans + "°.");
+    else if (reflex && v === inner) fb(box, "bad", "That's the smaller angle. The arc shows the reflex angle, so subtract from 360°: 360° − " + inner + "° = " + ans + "°.");
+    else fb(box, "bad", "Not quite. The angle measures " + ans + "°." + (reflex ? " Measure the smaller angle (" + inner + "°), then subtract it from 360°." : ""));
+  }
+  root.append(el("h2", { text: "Read the protractor" }),
+    el("p", { class: "howto", text: "A protractor has two scales. Find the arm that sits on a 0, and read the scale that starts at that 0." + (G === 6 ? " If the red arc goes the long way around, it's a reflex angle: subtract the smaller angle from 360°." : "") }),
+    el("p", { class: "prompt" }, ["What is the measure of the angle marked by the red arc?"]), el("div", { class: "stage" }, [svg]),
+    el("div", { class: "row" }, [a.node, el("button", { class: "btn", text: "Check", onclick: check }), el("button", { class: "btn ghost", text: "Next angle", onclick: render }), scoreEl("measure")]), box);
+  setTimeout(function () { try { a.input.focus({ preventScroll: true }); } catch (e) {} }, 0);
+}
+
+// ---------- 4. Build it ----------
+function gameBuild(root) {
+  var G = state.grade, target, kind = null;
+  if (G === 4) { kind = pick(["acute", "right", "obtuse", "straight"]); }
+  else target = G === 5 ? rnd(3, 35) * 5 : rnd(3, 71) * 5;
+  var cur = 0, showP = G !== 4, done = false;
+  var cx = 250, cy = G === 6 ? 230 : 230, R = 190;
+  var svg = svgBox(500, G === 6 ? 470 : 270); svg.setAttribute("tabindex", "0"); svg.setAttribute("aria-label", "Drag to turn the red arm. Arrow keys turn it one degree.");
+  var box = el("div", { class: "feedback", "aria-live": "polite" });
+  function draw() {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var g = s("g", {}); svg.appendChild(g);
+    if (showP) protractor(g, cx, cy, R, G === 6);
+    ray(g, cx, cy, 0, R + 10, C.ink); ray(g, cx, cy, cur, R + 10, C.arc);
+    arc(g, cx, cy, 40, 0, cur, C.arc, 4); dot(g, cx, cy);
+    var hp = P(cx, cy, R + 10, cur); svg.appendChild(s("circle", { cx: hp[0], cy: hp[1], r: 12, fill: C.arc, stroke: "#fff", "stroke-width": 3 }));
+  }
+  function setFrom(evt) {
+    if (done) return;
+    var r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal, x = (evt.clientX - r.left) * vb.width / r.width, y = (evt.clientY - r.top) * vb.height / r.height;
+    var a = Math.round(norm(Math.atan2(cy - y, x - cx) * 180 / Math.PI));
+    if (G !== 6 && a > 180) a = a > 270 ? 0 : 180;
+    cur = a; draw();
+  }
+  var dragging = false;
+  svg.addEventListener("pointerdown", function (e) { dragging = true; try { svg.setPointerCapture(e.pointerId); } catch (x) {} setFrom(e); });
+  svg.addEventListener("pointermove", function (e) { if (dragging) setFrom(e); });
+  svg.addEventListener("pointerup", function () { dragging = false; });
+  svg.addEventListener("keydown", function (e) {
+    if (done) return; var lim = G === 6 ? 359 : 180;
+    if (e.key === "ArrowLeft" || e.key === "ArrowUp") { cur = Math.min(lim, cur + 1); draw(); e.preventDefault(); }
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") { cur = Math.max(0, cur - 1); draw(); e.preventDefault(); }
+  });
+  function check() {
+    if (done) return;
+    if (G === 4) {
+      var t = cur === 90 ? "right" : cur === 180 ? "straight" : cur < 90 ? "acute" : cur < 180 ? "obtuse" : "reflex";
+      var near = (kind === "right" && Math.abs(cur - 90) <= 3) || (kind === "straight" && Math.abs(cur - 180) <= 3);
+      if (t === kind || near) { done = true; bump("build"); fb(box, "good", "Yes! That's " + (kind === "acute" ? "an" : "a") + " " + kind + " angle. It measures about " + cur + "°."); }
+      else fb(box, "bad", "That angle is about " + cur + "°, which is " + t + ". Try again: " + { acute: "make it smaller than a square corner.", right: "make a square corner.", obtuse: "open it wider than a square corner but not flat.", straight: "open it all the way into a straight line." }[kind]);
+    } else {
+      var diff = Math.abs(cur - target);
+      if (diff <= 2) { done = true; bump("build"); fb(box, "good", "Correct! Your angle is " + cur + "°."); }
+      else fb(box, "bad", "Your angle is " + cur + "°. " + (cur < target ? "Open it wider." : "Close it a little.") + (showP ? "" : " Turn the protractor on to check."));
+    }
+  }
+  var toggle = G === 4 ? null : el("label", { class: "toggle" }, [el("input", { type: "checkbox", id: "showp", checked: "", onchange: function (e) { showP = e.target.checked; draw(); } }), " Show protractor"]);
+  draw();
+  root.append(el("h2", { text: "Build it" }),
+    el("p", { class: "howto", text: "Drag the red arm (or click the picture and use the arrow keys) to make the angle, then press Check." }),
+    el("p", { class: "prompt" }, G === 4 ? ["Make " + (kind === "acute" ? "an " : "a "), el("b", { text: kind }), " angle."] : ["Make an angle of ", el("b", { text: target + "°" }), "."]),
+    el("div", { class: "stage" }, [svg]),
+    el("div", { class: "row" }, [el("button", { class: "btn", text: "Check", onclick: check }), toggle, el("button", { class: "btn ghost", text: "New angle", onclick: render }), scoreEl("build")]), box);
+}
+
+// ---------- 5. Missing angle ----------
+function gameMissing(root) {
+  var G = state.grade, kind;
+  if (G === 4) kind = "right"; else if (G === 5) kind = pick(["right", "straight", "straight3"]); else kind = pick(["straight3", "point", "opposite", "adjacent"]);
+  var cx = 250, cy = 170, L = 150, rot = G === 4 ? 0 : rnd(0, 7) * 15;
+  var svg = svgBox(500, 340), g = s("g", {}); svg.appendChild(g);
+  var ans, text, why;
+  var st = G === 4 ? 10 : 5;
+  if (kind === "right") {
+    var a = rnd(2, 90 / st - 2) * st; ans = 90 - a;
+    ray(g, cx, cy, rot, L); ray(g, cx, cy, rot + a, L); ray(g, cx, cy, rot + 90, L);
+    rightMark(g, cx, cy, rot, 18, C.muted); arc(g, cx, cy, 52, rot, rot + a, C.arc2); arc(g, cx, cy, 70, rot + a, rot + 90, C.arc);
+    label(g, cx, cy, 96, rot + a / 2, a + "°", C.arc2); label(g, cx, cy, 108, rot + a + ans / 2, "?", C.arc);
+    text = "The two angles make a right angle."; why = "A right angle is 90°, so ? = 90° − " + a + "° = " + ans + "°.";
+  } else if (kind === "straight") {
+    var a2 = rnd(4, 32) * 5; ans = 180 - a2;
+    ray(g, cx, cy, rot, L); ray(g, cx, cy, rot + 180, L); ray(g, cx, cy, rot + a2, L);
+    arc(g, cx, cy, 46, rot, rot + a2, C.arc2); arc(g, cx, cy, 62, rot + a2, rot + 180, C.arc);
+    label(g, cx, cy, 90, rot + a2 / 2, a2 + "°", C.arc2); label(g, cx, cy, 96, rot + a2 + ans / 2, "?", C.arc);
+    text = "The angles are on a straight line."; why = "A straight angle is 180°, so ? = 180° − " + a2 + "° = " + ans + "°.";
+  } else if (kind === "straight3") {
+    var p = rnd(4, 14) * 5, q = rnd(4, 14) * 5; ans = 180 - p - q;
+    var order = shuffle([["k1", p], ["k2", q], ["u", ans]]), start = rot;
+    ray(g, cx, cy, rot, L); ray(g, cx, cy, rot + 180, L);
+    order.forEach(function (o, i) {
+      var col = o[0] === "u" ? C.arc : i % 2 ? C.arc3 : C.arc2;
+      if (i > 0) ray(g, cx, cy, start, L);
+      arc(g, cx, cy, 44 + i * 10, start, start + o[1], col); label(g, cx, cy, 96 + (i % 2) * 14, start + o[1] / 2, o[0] === "u" ? "?" : o[1] + "°", col);
+      start += o[1];
+    });
+    text = "The three angles are on a straight line."; why = "They add to 180°, so ? = 180° − " + p + "° − " + q + "° = " + ans + "°.";
+  } else if (kind === "point") {
+    var x1 = rnd(12, 28) * 5, x2 = rnd(12, 28) * 5; ans = 360 - x1 - x2;
+    var parts = shuffle([["k", x1], ["k", x2], ["u", ans]]), at = rot;
+    parts.forEach(function (o, i) {
+      ray(g, cx, cy, at, L); var col = o[0] === "u" ? C.arc : i % 2 ? C.arc3 : C.arc2;
+      arc(g, cx, cy, 40 + i * 9, at, at + o[1], col); label(g, cx, cy, 92, at + o[1] / 2, o[0] === "u" ? "?" : o[1] + "°", col);
+      at += o[1];
+    });
+    text = "The angles are around a point."; why = "Angles around a point add to 360°, so ? = 360° − " + x1 + "° − " + x2 + "° = " + ans + "°.";
+  } else {
+    var th = rnd(6, 30) * 5; if (th === 90) th = 70;
+    ray(g, cx, cy, rot, L); ray(g, cx, cy, rot + 180, L); ray(g, cx, cy, rot + th, L); ray(g, cx, cy, rot + th + 180, L);
+    arc(g, cx, cy, 44, rot, rot + th, C.arc2); label(g, cx, cy, 86, rot + th / 2, th + "°", C.arc2);
+    if (kind === "opposite") { ans = th; arc(g, cx, cy, 44, rot + 180, rot + 180 + th, C.arc); label(g, cx, cy, 86, rot + 180 + th / 2, "?", C.arc); text = "Two straight lines cross."; why = "Opposite angles are equal, so ? = " + th + "°."; }
+    else { ans = 180 - th; arc(g, cx, cy, 52, rot + th, rot + 180, C.arc); label(g, cx, cy, 92, rot + th + ans / 2, "?", C.arc); text = "Two straight lines cross."; why = "Angles next to each other on a straight line add to 180°, so ? = 180° − " + th + "° = " + ans + "°."; }
+  }
+  dot(g, cx, cy);
+  svg.setAttribute("aria-label", text + " Find the angle marked with a question mark.");
+  var box = el("div", { class: "feedback", "aria-live": "polite" }), done = false, a = answerBox(check);
+  function check() {
+    if (done) return; if (a.input.value === "") { fb(box, "info", "Type the missing angle in degrees."); return; }
+    done = true; var ok = +a.input.value === ans; if (ok) bump("missing");
+    fb(box, ok ? "good" : "bad", (ok ? "Correct! " : "Not quite. ") + why);
+  }
+  root.append(el("h2", { text: "Missing angle" }),
+    el("p", { class: "howto", text: "Don't measure: work it out with what you know. a right angle is 90°, a straight angle is 180°" + (G === 6 ? ", angles around a point add to 360° and opposite angles are equal." : ".") }),
+    el("p", { class: "prompt" }, [text + " Find the angle marked ", el("b", { text: "?" }), "."]), el("div", { class: "stage" }, [svg]),
+    el("div", { class: "row" }, [a.node, el("button", { class: "btn", text: "Check", onclick: check }), el("button", { class: "btn ghost", text: "Next", onclick: render }), scoreEl("missing")]), box);
+}
+
+// ---------- shell ----------
+var DRAW = { name: gameName, estimate: gameEstimate, measure: gameMeasure, build: gameBuild, missing: gameMissing };
+var main = document.getElementById("main");
+function render() {
+  document.querySelectorAll("[data-grade]").forEach(function (b) { b.setAttribute("aria-pressed", String(+b.dataset.grade === state.grade)); });
+  document.querySelectorAll("[data-game]").forEach(function (b) { b.setAttribute("aria-selected", String(b.dataset.game === state.game)); });
+  main.innerHTML = "";
+  var panel = el("section", { class: "panel", role: "tabpanel", "aria-labelledby": "t-" + state.game });
+  main.appendChild(panel); DRAW[state.game](panel);
+  var h = "g" + state.grade + "-" + state.game;
+  if (location.hash.slice(1) !== h) { try { history.replaceState(null, "", "#" + h); } catch (e) { location.hash = h; } }
+}
+function fromHash() { var m = /^#g([456])-([a-z]+)$/.exec(location.hash); if (m && GAMES.indexOf(m[2]) !== -1) { state.grade = +m[1]; state.game = m[2]; return true; } return false; }
+document.querySelectorAll("[data-grade]").forEach(function (b) { b.addEventListener("click", function () { state.grade = +b.dataset.grade; render(); }); });
+document.querySelectorAll("[data-game]").forEach(function (b) { b.addEventListener("click", function () { state.game = b.dataset.game; render(); }); });
+window.addEventListener("hashchange", function () { if (fromHash()) render(); });
+fromHash(); render();
+window.__angle = { typeOf: typeOf };
+})();
+</script>
+</body>
+</html>

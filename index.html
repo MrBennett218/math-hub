@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bennett Math Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Same notebook world as Number Lab: graph paper, ink, place-value colours for the five steps. */
+  --paper: #fbfcf8;
+  --grid: #e4ebe4;
+  --ink: #1d2a33;
+  --muted: #5d6b73;
+  --accent: #1f4e8c;
+  --learn: #7b45c9; --practice: #2f6fd6; --play: #1f8a5b; --hands: #b67c00; --check: #d9482b;
+  --display: "Bricolage Grotesque", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", Verdana, system-ui, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.45;
+}
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+header { padding: 22px 0 8px; display: grid; gap: 14px; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(30px, 5.5vw, 46px); margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
+h1 .chips { display: inline-flex; gap: 3px; vertical-align: middle; margin-right: 10px; }
+h1 .chips i { width: 14px; height: 36px; border-radius: 3px; display: inline-block; }
+.lead { margin: 0; color: var(--muted); max-width: 64ch; }
+.pickers { display: grid; gap: 10px; }
+.pickrow { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.pickrow > span { font-weight: 700; min-width: 112px; }
+button { font: inherit; cursor: pointer; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.pill { border: 2px solid var(--ink); background: #fff; color: var(--ink); border-radius: 999px; padding: 7px 16px; font-weight: 700; }
+.pill[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.pill small { font-weight: 400; opacity: .8; }
+main { padding: 12px 0 40px; display: grid; gap: 18px; }
+.blockhead { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.blockhead h2 { font-family: var(--display); font-weight: 800; font-size: 28px; margin: 0; }
+.blockhead .tag { font-weight: 700; color: var(--muted); }
+.steps { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
+.step { background: #fff; border: 2px solid var(--ink); border-radius: 14px; overflow: hidden; display: grid; grid-template-rows: auto 1fr; box-shadow: 5px 5px 0 var(--grid); }
+.step header { padding: 10px 16px; color: #fff; display: flex; align-items: baseline; gap: 10px; }
+.step header b { font-family: var(--display); font-size: 22px; }
+.step header .num { width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,.25); display: inline-grid; place-items: center; font-weight: 700; font-size: 14px; flex: none; align-self: center; }
+.step header span.what { font-size: 14px; opacity: .92; }
+.items { list-style: none; margin: 0; padding: 8px; display: grid; gap: 6px; align-content: start; }
+.items a, .items .plain { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 10px 12px; border-radius: 10px; text-decoration: none; color: var(--ink); border: 2px solid transparent; }
+.items a:hover { border-color: var(--ink); background: #f6f8f5; }
+.items .t { font-weight: 700; }
+.items .d { grid-column: 1; color: var(--muted); font-size: 14.5px; }
+.items .go { grid-row: 1 / span 2; grid-column: 2; align-self: center; font-weight: 700; font-size: 14px; color: var(--accent); white-space: nowrap; }
+.items .plain .go { color: var(--muted); }
+.note { background: #fff; border: 2px dashed #b8c2bc; border-radius: 12px; padding: 12px 16px; color: var(--muted); font-size: 15px; }
+.note b { color: var(--ink); }
+footer { color: var(--muted); font-size: 14px; padding-bottom: 30px; }
+@media (max-width: 520px) { .pickrow > span { min-width: 100%; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span class="chips" aria-hidden="true"><i style="background:var(--check)"></i><i style="background:var(--practice)"></i><i style="background:var(--play)"></i></span>Bennett Math Hub</h1>
+    <p class="lead">After the lesson, come here. Pick your grade and the block we're working on, then go through the five steps: learn, practise, play, try it hands-on, and check.</p>
+    <div class="pickers">
+      <div class="pickrow" role="group" aria-label="Your grade"><span>1. Your grade</span>
+        <button class="pill" data-grade="4" id="grade-4">Grade 4</button>
+        <button class="pill" data-grade="5" id="grade-5">Grade 5</button>
+        <button class="pill" data-grade="6" id="grade-6">Grade 6</button>
+      </div>
+      <div class="pickrow" role="group" aria-label="Math block" id="blockpicks"><span>2. Math block</span></div>
+    </div>
+  </header>
+  <main id="main"></main>
+  <footer>Edwin links: sign in to Edwin with your school Google account first (go.edwin.app). Stuck? Ask your teacher.</footer>
+</div>
+
+<script>
+(function () {
+"use strict";
+// ======== EDIT HERE: one entry per carousel block ========
+var EDWIN = "https://go.edwin.app";
+// Work (ddsb.ca) Classroom classes for each grade: [name, class id]
+var CLASS = { 4: ["Bennett6", "ODcyODAyODU0MTE0"], 5: ["Bennett5", "ODcyODAyNjMxODM3"], 6: ["Bennett6", "ODcyODAyODU0MTE0"] };
+var BLOCKS = [
+  {
+    id: "b01", code: "B01", short: "Whole numbers", dates: "Oct 1\u20135", title: "Whole numbers: place value, estimating and comparing",
+    learn: {
+      4: [["Chapter 1: Numbers to 10 000", "Start here for the chapter overview", "/subjects/dbef76e5-a1f6-4eb2-87dc-dd1b1bb4c26c/units/6a32edbaee7195a2200d549f"],
+          ["1.2 Place Value", "Thousands, hundreds, tens and ones", "/subjects/dbef76e5-a1f6-4eb2-87dc-dd1b1bb4c26c/units/6a32edbaee7195a2200d549f/c11baab9-9b86-42c7-832f-092925bf7928"],
+          ["1.3 Comparing and Ordering Numbers", "Which number is greater?", "/subjects/dbef76e5-a1f6-4eb2-87dc-dd1b1bb4c26c/units/6a32edbaee7195a2200d549f/1a62754a-a2e5-4433-bb72-e3ccd397b9c9"],
+          ["1.4 Rounding Numbers to Estimate", "Nearest ten, hundred and thousand", "/subjects/dbef76e5-a1f6-4eb2-87dc-dd1b1bb4c26c/units/6a32edbaee7195a2200d549f/19b0ca79-b237-417f-8efc-292ecbaeb1a8"]],
+      5: [["Chapter 1: Numbers to 100 000", "Start here for the chapter overview", "/subjects/9d7986d8-338d-42b1-9e4f-6e720d9b4cd0/units/6a3438f0e1f8176961be473b"],
+          ["1.1 Numbers to 100 000", "Reading and writing big numbers", "/subjects/9d7986d8-338d-42b1-9e4f-6e720d9b4cd0/units/6a3438f0e1f8176961be473b/610cd298-eeba-4cc6-b2a2-493b371b4089"],
+          ["1.2 Comparing Numbers to 100 000", "Which number is greater?", "/subjects/9d7986d8-338d-42b1-9e4f-6e720d9b4cd0/units/6a3438f0e1f8176961be473b/e6eec6d9-6e02-4407-ad9a-f2c8a43c147a"],
+          ["1.3 Decomposing and Composing Numbers", "Breaking numbers apart and putting them together", "/subjects/9d7986d8-338d-42b1-9e4f-6e720d9b4cd0/units/6a3438f0e1f8176961be473b/56499428-2222-4f55-9925-c83fafea2bac"]],
+      6: [["Chapter 1: Numbers to 1 000 000", "Start here for the chapter overview", "/subjects/293cd14f-01b6-4dea-a9d8-84a3124817eb/units/6a31a1251dce82335c3dce17"],
+          ["1.1 Numbers to 1 000 000", "Reading and writing numbers in the millions", "/subjects/293cd14f-01b6-4dea-a9d8-84a3124817eb/units/6a31a1251dce82335c3dce17/a669e134-cae3-4d15-8af5-85c75e068e2f"],
+          ["1.2 Place Value", "What each digit is worth", "/subjects/293cd14f-01b6-4dea-a9d8-84a3124817eb/units/6a31a1251dce82335c3dce17/685538d0-e3e3-4885-a036-12cdf1a70990"],
+          ["1.3 Comparing Numbers to 1 000 000", "Which number is greater?", "/subjects/293cd14f-01b6-4dea-a9d8-84a3124817eb/units/6a31a1251dce82335c3dce17/c17c277a-b7ec-4a88-8e6f-41c758447f37"]]
+    },
+    workbook: { 4: "4A, Practices 1–5", 5: "5A, Practices 1–3", 6: "6A, Practices 1–3" },
+    lab: "number-lab.html", labName: "Number Lab",
+    hands: function (G) { return [
+      ["Base Ten Blocks", "Edwin's virtual base ten blocks. Build and regroup numbers.", EDWIN + "/interactive-tools", "Edwin \u2192"],
+      ["Place value disks", "Build numbers with disks in Number Lab", "number-lab.html#g" + G + "-disks", "Open \u2192"],
+      ["Place value chart and number cards", "Ask for a printed chart and cards at the hands-on table", null, "In class"]]; },
+    games: [["mystery", "Mystery number", "Use the clues to find the number"],
+            ["disks", "Place value disks", "Build numbers and regroup"],
+            ["round", "Round it", "Round on a number line"],
+            ["closest", "Digit cards", "Make the greatest, least or closest number"],
+            ["order", "Order up", "Put numbers in order"]]
+  },
+  {
+    id: "angles", code: "Angles", short: "", dates: "Oct 6\u201315 \u00b7 7 lessons", title: "Identifying, measuring and finding unknown angles",
+    learn: {
+      4: [["Chapter 15: Angles and Lines", "Start here for the chapter overview", "/subjects/dbef76e5-a1f6-4eb2-87dc-dd1b1bb4c26c/units/6a753295bd9d2b1a513fe13d"],
+          ["15.1 Identifying Angles", "Acute, right, obtuse and straight angles", "/subjects/dbef76e5-a1f6-4eb2-87dc-dd1b1bb4c26c/units/6a753295bd9d2b1a513fe13d/0fe472fa-7298-4250-8830-8c199c827afb"],
+          ["15.2 Perpendicular Lines", "Lines that meet at a right angle", "/subjects/dbef76e5-a1f6-4eb2-87dc-dd1b1bb4c26c/units/6a753295bd9d2b1a513fe13d/0db4f88d-5859-413c-89ee-d0cbba0b84c8"],
+          ["15.3 Parallel Lines", "Lines that never meet", "/subjects/dbef76e5-a1f6-4eb2-87dc-dd1b1bb4c26c/units/6a753295bd9d2b1a513fe13d/8e4b3477-bdba-4597-b0fb-808c5d8ef8d6"],
+          ["15.4 Horizontal and Vertical Lines", "Across and up-and-down", "/subjects/dbef76e5-a1f6-4eb2-87dc-dd1b1bb4c26c/units/6a753295bd9d2b1a513fe13d/a7cf246b-6b1a-4e51-b718-a623720bd0d7"],
+          ["Chapter 15 Wrap Up", "Review the chapter and try the Progress Check", "/subjects/dbef76e5-a1f6-4eb2-87dc-dd1b1bb4c26c/units/6a753295bd9d2b1a513fe13d/a9510ff3-1c75-420a-8038-ea48b09688c7"]],
+      5: [["Chapter 11: Angles", "Start here for the chapter overview", "/subjects/9d7986d8-338d-42b1-9e4f-6e720d9b4cd0/units/6a73773940af7bd7dfe7fdef"],
+          ["11.1 Measuring Angles to 180°", "Using a protractor", "/subjects/9d7986d8-338d-42b1-9e4f-6e720d9b4cd0/units/6a73773940af7bd7dfe7fdef/9f65e2fb-b676-45eb-93e0-165d63eb09db"],
+          ["11.2 Drawing Angles to 180°", "Drawing an angle with a protractor", "/subjects/9d7986d8-338d-42b1-9e4f-6e720d9b4cd0/units/6a73773940af7bd7dfe7fdef/ff1515ae-141c-470a-8f7b-b6afd3f517ac"],
+          ["11.3 Determining Unknown Angle Measures", "Finding a missing angle", "/subjects/9d7986d8-338d-42b1-9e4f-6e720d9b4cd0/units/6a73773940af7bd7dfe7fdef/3e3af52e-feda-4a79-8eb0-a08005402851"],
+          ["11.4 Parts of a Straight Angle", "Angles on a straight line add to 180°", "/subjects/9d7986d8-338d-42b1-9e4f-6e720d9b4cd0/units/6a73773940af7bd7dfe7fdef/0f40b6c2-178a-4ba8-8e88-abec855bde98"],
+          ["Chapter 11 Wrap Up", "Review the chapter and try the Progress Check", "/subjects/9d7986d8-338d-42b1-9e4f-6e720d9b4cd0/units/6a73773940af7bd7dfe7fdef/e7cdb712-b5a9-41cf-aeca-cc5d8f558319"]],
+      6: [["Chapter 13: Angles, Quadrilaterals, and Rotational Symmetry", "Start here for the chapter overview", "/subjects/293cd14f-01b6-4dea-a9d8-84a3124817eb/units/6a7b8b0c761ce48c1ced10b1"],
+          ["13.1 Constructing and Measuring Angles to 360°", "Reflex angles and full turns", "/subjects/293cd14f-01b6-4dea-a9d8-84a3124817eb/units/6a7b8b0c761ce48c1ced10b1/a2e109dd-6169-4d55-8ab6-f6e5b9d446fa"],
+          ["13.2 Angles at a Point", "Angles around a point add to 360°", "/subjects/293cd14f-01b6-4dea-a9d8-84a3124817eb/units/6a7b8b0c761ce48c1ced10b1/d042b41d-fac6-4078-8a13-154712f02f61"],
+          ["13.3 Opposite Angles", "When two lines cross", "/subjects/293cd14f-01b6-4dea-a9d8-84a3124817eb/units/6a7b8b0c761ce48c1ced10b1/2280a2c9-b2d5-4b93-bd72-02036147e6fa"],
+          ["Chapter 13 Wrap Up", "Review the chapter (the angles part is 13.1\u201313.3)", "/subjects/293cd14f-01b6-4dea-a9d8-84a3124817eb/units/6a7b8b0c761ce48c1ced10b1/db8e0cc6-0a19-4e03-adc1-63a20802786a"]]
+    },
+    workbook: { 4: "4C, Practices 1–4", 5: "5B, Practices 1–4", 6: "6C" },
+    lab: "angle-lab.html", labName: "Angle Lab",
+    hands: function (G) { var h = [];
+      if (G !== 4) h.push(["Understanding and Measuring Angles", "Edwin's interactive angle tool. Find it in lesson " + (G === 5 ? "11.1" : "13.1") + " in step 1.", null, "In Edwin"]);
+      h.push(["Geometry Tools", "Edwin's virtual protractor and ruler", EDWIN + "/interactive-tools", "Edwin →"]);
+      h.push(["Build an angle", "Drag an arm to make an angle in Angle Lab", "angle-lab.html#g" + G + "-build", "Open →"]);
+      h.push(G === 4 ? ["Angle hunt", "Find acute, right and obtuse angles around the classroom and record them", null, "In class"]
+                     : ["Protractor and recording sheet", "Measure and draw angles with a real protractor at the hands-on table", null, "In class"]);
+      return h; },
+    games: [["name", "Name it", "Acute, right, obtuse, straight"],
+            ["estimate", "Estimate it", "Use 90° and 180° as benchmarks"],
+            ["measure", "Read the protractor", "Pick the right scale"],
+            ["build", "Build it", "Drag to make the angle"],
+            ["missing", "Missing angle", "Use what you know to find it"]]
+  }
+];
+// =========================================================
+
+// The block students see first: change this when the class moves on.
+var CURRENT = "angles";
+var state = { grade: null, block: CURRENT };
+try { var g = localStorage.getItem("hub-grade"); if (g) state.grade = +g; } catch (e) {}
+var m = /^#g([456])(?:-([a-z0-9]+))?$/.exec(location.hash);
+if (m) { state.grade = +m[1]; if (m[2]) state.block = m[2]; }
+
+function el(tag, attrs, kids) {
+  var e = document.createElement(tag);
+  for (var k in attrs || {}) { if (k === "text") e.textContent = attrs[k]; else if (k.slice(0, 2) === "on") e.addEventListener(k.slice(2), attrs[k]); else e.setAttribute(k, attrs[k]); }
+  (kids || []).forEach(function (c) { if (c != null) e.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+  return e;
+}
+function item(t, d, href, go) {
+  var kids = [el("span", { class: "t", text: t }), el("span", { class: "go", text: go || "Open →" }), el("span", { class: "d", text: d })];
+  return el("li", {}, [href ? el("a", { href: href, target: "_blank", rel: "noopener" }, kids) : el("div", { class: "plain" }, kids)]);
+}
+function step(n, name, what, colour, items) {
+  return el("section", { class: "step", "aria-label": name }, [
+    el("header", { style: "background:var(" + colour + ")" }, [el("span", { class: "num", text: String(n) }), el("b", { text: name }), el("span", { class: "what", text: what })]),
+    el("ul", { class: "items" }, items)
+  ]);
+}
+function render() {
+  document.querySelectorAll("[data-grade]").forEach(function (b) { b.setAttribute("aria-pressed", String(+b.dataset.grade === state.grade)); });
+  var bp = document.getElementById("blockpicks");
+  bp.querySelectorAll("button").forEach(function (b) { b.remove(); });
+  BLOCKS.forEach(function (b) {
+    bp.appendChild(el("button", { class: "pill", "aria-pressed": String(b.id === state.block), onclick: function () { state.block = b.id; render(); } }, [b.code, b.short ? el("small", { text: " " + b.short }) : null]));
+  });
+  var main = document.getElementById("main"); main.innerHTML = "";
+  if (!state.grade) { main.appendChild(el("p", { class: "note" }, [el("b", { text: "Pick your grade above " }), "to see your practice for this block."])); return; }
+  var B = BLOCKS.filter(function (b) { return b.id === state.block; })[0], G = state.grade;
+  main.appendChild(el("div", { class: "blockhead" }, [el("h2", { text: B.code + " · " + B.title }), el("span", { class: "tag", text: "Grade " + G + (B.dates ? " \u00b7 " + B.dates : "") })]));
+  var steps = el("div", { class: "steps" });
+  steps.append(
+    step(1, "Learn", "Review the lesson", "--learn", B.learn[G].map(function (l) { return item(l[0], l[1], EDWIN + l[2], "Edwin →"); })),
+    step(2, "Practise", "Show what you know", "--practice", [
+      item("Online Workbook " + B.workbook[G], "Inside each Edwin lesson in step 1, under Online Workbook", null, "In Edwin"),
+      item("Knowledge Hook", "Do the mission your teacher assigned", "https://www.knowledgehook.com/", "Open →"),
+      item("JUMP Math pages", "Your pages for this block are in your math folder", null, "On paper")
+    ]),
+    step(3, "Play", B.labName + " games", "--play", B.games.map(function (gm) { return item(gm[1], gm[2], B.lab + "#g" + G + "-" + gm[0], "Play \u2192"); })),
+    step(4, "Hands-on", "Use a math tool", "--hands", B.hands(G).map(function (h) { return item(h[0], h[1], h[2], h[3]); })),
+    step(5, "Check", "Show your teacher", "--check", [
+      item("Block quiz", "Your quiz is in your " + CLASS[G][0] + " Google Classroom, under Math. Use your school account.", "https://classroom.google.com/w/" + CLASS[G][1] + "/t/all", "Classroom \u2192"),
+      item("Level 4 challenge", "Finished the quiz? Ask for the Level 4 extension sheet", null, "Ask your teacher")
+    ])
+  );
+  main.appendChild(steps);
+  var h = "g" + G + "-" + state.block;
+  if (location.hash.slice(1) !== h) { try { history.replaceState(null, "", "#" + h); } catch (e) {} }
+}
+document.querySelectorAll("[data-grade]").forEach(function (b) {
+  b.addEventListener("click", function () { state.grade = +b.dataset.grade; try { localStorage.setItem("hub-grade", String(state.grade)); } catch (e) {} render(); });
+});
+window.addEventListener("hashchange", function () { var mm = /^#g([456])(?:-([a-z0-9]+))?$/.exec(location.hash); if (mm) { state.grade = +mm[1]; if (mm[2]) state.block = mm[2]; render(); } });
+render();
+})();
+</script>
+</body>
+</html>
