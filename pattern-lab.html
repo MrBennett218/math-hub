@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pattern Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Same notebook world as Number Lab; angle arcs carry the colour. */
+  --paper: #fbfcf8; --grid: #e4ebe4; --ink: #1d2a33; --muted: #5d6b73; --line: #c9d3cc;
+  --accent: #1f4e8c; --good: #1f7a46; --bad: #c0392b;
+  --arc: #d9482b; --arc2: #2f6fd6; --arc3: #1f8a5b; --prot: #7b45c9;
+  --display: "Bricolage Grotesque", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", Verdana, system-ui, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background-color: var(--paper); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 24px 24px; color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.45; }
+header { padding: 18px 20px 6px; max-width: 1040px; margin: 0 auto; display: grid; gap: 12px; }
+.brand { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 5vw, 42px); margin: 0; letter-spacing: -0.02em; }
+h1 svg { vertical-align: -6px; margin-right: 8px; }
+.sub { color: var(--muted); font-size: 15px; }
+.bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+.grades, .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+button { font: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible, svg:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.pill { border: 2px solid var(--ink); background: #fff; color: var(--ink); border-radius: 999px; padding: 6px 14px; font-weight: 700; }
+.pill[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.tab { border: 0; background: transparent; color: var(--muted); padding: 8px 12px; border-radius: 8px; font-weight: 700; border-bottom: 3px solid transparent; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); background: #fff; }
+main { max-width: 1040px; margin: 0 auto; padding: 8px 20px 40px; }
+.panel { background: #fff; border: 2px solid var(--ink); border-radius: 14px; padding: 20px; box-shadow: 6px 6px 0 var(--grid); display: grid; gap: 14px; }
+.panel h2 { font-family: var(--display); font-weight: 800; font-size: 26px; margin: 0; }
+.howto { color: var(--muted); margin: 0; max-width: 68ch; }
+.prompt { font-size: 20px; margin: 0; }
+.prompt b { font-family: var(--display); }
+.stage { display: grid; justify-items: center; }
+svg.fig { width: 100%; max-width: 520px; height: auto; display: block; touch-action: none; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.btn { border: 2px solid var(--ink); background: var(--ink); color: #fff; border-radius: 10px; padding: 9px 16px; font-weight: 700; }
+.btn.ghost { background: #fff; color: var(--ink); }
+.score { margin-left: auto; font-weight: 700; color: var(--muted); }
+.score b { color: var(--ink); font-family: var(--display); font-size: 20px; }
+.feedback { min-height: 28px; font-size: 18px; border-left: 5px solid transparent; padding: 6px 12px; border-radius: 4px; }
+.feedback.good { border-color: var(--good); background: #e8f4ec; }
+.feedback.bad { border-color: var(--bad); background: #fbeceb; }
+.feedback.info { border-color: var(--accent); background: #eaf0f8; }
+.choices { display: flex; gap: 10px; flex-wrap: wrap; }
+.choice { border: 2px solid var(--ink); background: #fff; border-radius: 12px; padding: 10px 18px; font-family: var(--display); font-weight: 800; font-size: 22px; min-width: 110px; }
+.choice.right { background: #e3f3e8; border-color: var(--good); }
+.choice.wrong { background: #fbe3e1; border-color: var(--bad); }
+.ans { display: flex; align-items: center; gap: 6px; font-family: var(--display); font-weight: 800; font-size: 24px; }
+.ans input { width: 110px; font: inherit; border: 2px solid var(--ink); border-radius: 10px; padding: 6px 10px; text-align: right; }
+.toggle { display: inline-flex; gap: 6px; align-items: center; font-weight: 700; }
+footer { max-width: 1040px; margin: 0 auto; padding: 0 20px 30px; color: var(--muted); font-size: 14px; }
+@media (max-width: 520px) { .choice { font-size: 18px; min-width: 90px; } }
+</style>
+<style>
+.seq { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.term { min-width: 64px; padding: 10px 12px; border: 2px solid var(--ink); border-radius: 10px; background: #fff; font-family: var(--display); font-weight: 800; font-size: 26px; text-align: center; font-variant-numeric: tabular-nums; }
+.term.blank { border-style: dashed; color: var(--arc); }
+.arrowtxt { color: var(--muted); font-weight: 700; }
+table.pt { border-collapse: collapse; font-variant-numeric: tabular-nums; }
+table.pt th, table.pt td { border: 2px solid var(--ink); padding: 8px 16px; text-align: center; font-size: 20px; }
+table.pt th { background: #f1f4f1; font-size: 16px; }
+table.pt td.q { color: var(--arc); font-weight: 800; }
+.figs { display: flex; gap: 22px; flex-wrap: wrap; align-items: flex-end; }
+.fig { display: grid; gap: 6px; justify-items: center; }
+.fig small { font-weight: 700; color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1><svg width="44" height="34" viewBox="0 0 44 34" aria-hidden="true"><rect x="2" y="24" width="8" height="8" fill="#2f6fd6"/><rect x="14" y="16" width="8" height="8" fill="#1f8a5b"/><rect x="14" y="24" width="8" height="8" fill="#1f8a5b"/><rect x="26" y="8" width="8" height="8" fill="#d9482b"/><rect x="26" y="16" width="8" height="8" fill="#d9482b"/><rect x="26" y="24" width="8" height="8" fill="#d9482b"/></svg>Pattern Lab</h1>
+    <span class="sub">B09 Patterns · Math carousel station</span>
+  </div>
+  <div class="bar">
+    <div class="grades" role="group" aria-label="Grade">
+      <button class="pill" data-grade="4" id="g4">Grade 4</button>
+      <button class="pill" data-grade="5" id="g5">Grade 5</button>
+      <button class="pill" data-grade="6" id="g6">Grade 6</button>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Games">
+      <button class="tab" role="tab" data-game="next" id="t-next">What comes next?</button>
+      <button class="tab" role="tab" data-game="rule" id="t-rule">Find the rule</button>
+      <button class="tab" role="tab" data-game="missing" id="t-missing">Missing term</button>
+      <button class="tab" role="tab" data-game="figures" id="t-figures">Growing figures</button>
+      <button class="tab" role="tab" data-game="table" id="t-table">Pattern table</button>
+    </div>
+  </div>
+</header>
+<main id="main"></main>
+<footer>Tip for teachers: each game and grade has its own link, like #g5-rule. Pick a grade and game, then copy the address.</footer>
+<script>
+(function () {
+"use strict";
+var GAMES = ["next", "rule", "missing", "figures", "table"];
+var state = { grade: 5, game: "next", score: {} };
+function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function el(tag, attrs, kids) {
+  var e = document.createElement(tag);
+  for (var k in attrs || {}) { if (k === "text") e.textContent = attrs[k]; else if (k.slice(0, 2) === "on") e.addEventListener(k.slice(2), attrs[k]); else e.setAttribute(k, attrs[k]); }
+  (kids || []).forEach(function (c) { if (c != null) e.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+  return e;
+}
+function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " "); }
+function bump(game) { var k = state.grade + game; state.score[k] = (state.score[k] || 0) + 1; var b = document.querySelector(".score b"); if (b) b.textContent = String(state.score[k]); }
+function scoreEl(game) { return el("span", { class: "score" }, ["Correct: ", el("b", { text: String(state.score[state.grade + game] || 0) })]); }
+function fb(box, kind, msg) { box.className = "feedback " + kind; box.textContent = msg; }
+function answerBox(onCheck, label) {
+  var inp = el("input", { type: "number", inputmode: "numeric", id: "ans", "aria-label": label || "Your answer" });
+  inp.addEventListener("keydown", function (e) { if (e.key === "Enter") onCheck(); });
+  return { node: el("label", { class: "ans", for: "ans" }, [inp]), input: inp };
+}
+
+// A pattern: {start, kind: "add"|"sub"|"mul", step}
+function makePattern(G, allowMul) {
+  var kinds = G === 4 ? ["add", "add", "sub"] : G === 5 ? ["add", "add", "sub"] : allowMul ? ["add", "sub", "mul"] : ["add", "sub"];
+  var kind = pick(kinds), p;
+  if (kind === "add") p = { kind: kind, step: G === 4 ? pick([2, 3, 4, 5, 10]) : G === 5 ? rnd(3, 12) : rnd(4, 25), start: G === 4 ? rnd(1, 20) : rnd(2, 60) };
+  else if (kind === "sub") { var st = G === 4 ? pick([2, 3, 5, 10]) : rnd(3, 12); p = { kind: kind, step: st, start: st * 7 + rnd(G === 4 ? 0 : 1, 20) }; }
+  else p = { kind: kind, step: pick([2, 3]), start: rnd(1, 5) };
+  return p;
+}
+function term(p, i) { return p.kind === "add" ? p.start + p.step * i : p.kind === "sub" ? p.start - p.step * i : p.start * Math.pow(p.step, i); }
+function ruleText(p) { return "Start at " + fmt(p.start) + " and " + (p.kind === "add" ? "add " : p.kind === "sub" ? "subtract " : "multiply by ") + p.step + " each time."; }
+function seqRow(vals, blankIdx) {
+  var row = el("div", { class: "seq" });
+  vals.forEach(function (v, i) { if (i) row.appendChild(el("span", { class: "arrowtxt", text: "," })); row.appendChild(el("span", { class: "term" + (i === blankIdx ? " blank" : ""), text: i === blankIdx ? "?" : fmt(v) })); });
+  return row;
+}
+
+// 1. What comes next?
+function gameNext(root) {
+  var G = state.grade, p = makePattern(G, true), n = G === 4 ? 4 : 5, vals = [];
+  for (var i = 0; i < n; i++) vals.push(term(p, i));
+  var ans = term(p, n), box = el("div", { class: "feedback", "aria-live": "polite" }), done = false, a = answerBox(check, "Next term");
+  function check() { if (done) return; if (a.input.value === "") { fb(box, "info", "Type the next number."); return; } done = true; var ok = +a.input.value === ans; if (ok) bump("next"); fb(box, ok ? "good" : "bad", (ok ? "Correct! " : "Not quite. The next term is " + fmt(ans) + ". ") + "The rule: " + ruleText(p)); }
+  root.append(el("h2", { text: "What comes next?" }), el("p", { class: "howto", text: "Look at how the numbers change from one term to the next. Then find the next term." }),
+    seqRow(vals.concat(["?"]), n), el("div", { class: "row" }, [a.node, el("button", { class: "btn", text: "Check", onclick: check }), el("button", { class: "btn ghost", text: "Next pattern", onclick: render }), scoreEl("next")]), box);
+}
+
+// 2. Find the rule
+function gameRule(root) {
+  var G = state.grade, p = makePattern(G, true), vals = [];
+  for (var i = 0; i < 5; i++) vals.push(term(p, i));
+  var right = ruleText(p), wrong = [];
+  var alt = [
+    { kind: p.kind, step: p.step, start: term(p, 1) },
+    { kind: p.kind === "add" ? "sub" : "add", step: p.step, start: p.start },
+    { kind: p.kind, step: p.kind === "mul" ? p.step + 1 : p.step + pick([1, 2]), start: p.start },
+    { kind: p.kind === "mul" ? "add" : p.kind, step: p.kind === "mul" ? p.start : Math.max(1, p.step - 1), start: p.start }
+  ];
+  alt.forEach(function (q) { var t = ruleText(q); if (t !== right && wrong.indexOf(t) === -1) wrong.push(t); });
+  var opts = shuffle([right].concat(wrong.slice(0, 3))), done = false, box = el("div", { class: "feedback", "aria-live": "polite" }), choices = el("div", { class: "choices" });
+  opts.forEach(function (o) {
+    choices.appendChild(el("button", { class: "choice", style: "font-size:18px;text-align:left", text: o, onclick: function (e) {
+      if (done) return; done = true; var ok = o === right; e.target.classList.add(ok ? "right" : "wrong");
+      if (!ok) choices.querySelectorAll(".choice").forEach(function (b) { if (b.textContent === right) b.classList.add("right"); });
+      if (ok) bump("rule");
+      fb(box, ok ? "good" : "bad", (ok ? "Correct! " : "Not quite. ") + "The pattern " + vals.map(fmt).join(", ") + " has the rule: " + right + " Check: does the rule make every term?");
+    } }));
+  });
+  root.append(el("h2", { text: "Find the rule" }), el("p", { class: "howto", text: "A pattern rule tells the start number and what happens each time. Test each rule on every term." }),
+    seqRow(vals, -1), choices, el("div", { class: "row" }, [el("button", { class: "btn", text: "Next pattern", onclick: render }), scoreEl("rule")]), box);
+}
+
+// 3. Missing term
+function gameMissing(root) {
+  var G = state.grade, p = makePattern(G, G === 6), vals = [];
+  for (var i = 0; i < 6; i++) vals.push(term(p, i));
+  var k = rnd(1, 4), ans = vals[k], done = false, box = el("div", { class: "feedback", "aria-live": "polite" }), a = answerBox(check, "Missing term");
+  function check() { if (done) return; if (a.input.value === "") { fb(box, "info", "Type the missing number."); return; } done = true; var ok = +a.input.value === ans; if (ok) bump("missing"); fb(box, ok ? "good" : "bad", (ok ? "Correct! " : "Not quite. The missing term is " + fmt(ans) + ". ") + "The rule: " + ruleText(p)); }
+  root.append(el("h2", { text: "Missing term" }), el("p", { class: "howto", text: "Use the terms before and after the gap to find the rule, then fill in the missing term." }),
+    seqRow(vals, k), el("div", { class: "row" }, [a.node, el("button", { class: "btn", text: "Check", onclick: check }), el("button", { class: "btn ghost", text: "Next pattern", onclick: render }), scoreEl("missing")]), box);
+}
+
+// 4. Growing figures: figure n has a*n + b squares (an L shape: a column of n+b plus a row of (a-1)*n)
+function figureSVG(n, a, b) {
+  var s = 22, cols = [], total = a * n + b;
+  // draw as a bars: (a) rows of n squares stacked, plus b extra squares on the left
+  var w = (n + (b > 0 ? 1 : 0)) * s + 4, h = Math.max(a, b) * s + 4;
+  var svg = '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="Figure ' + n + ' with ' + total + ' squares">';
+  var colors = ["#2f6fd6", "#1f8a5b", "#d9482b", "#7b45c9"];
+  for (var r = 0; r < a; r++) for (var c = 0; c < n; c++) svg += '<rect x="' + (2 + (b > 0 ? s : 0) + c * s) + '" y="' + (h - 2 - (r + 1) * s) + '" width="' + (s - 2) + '" height="' + (s - 2) + '" fill="' + colors[r % 4] + '"/>';
+  for (var e = 0; e < b; e++) svg += '<rect x="2" y="' + (h - 2 - (e + 1) * s) + '" width="' + (s - 2) + '" height="' + (s - 2) + '" fill="#b67c00"/>';
+  return svg + '</svg>';
+}
+function gameFigures(root) {
+  var G = state.grade, a = G === 4 ? pick([1, 2]) : rnd(2, 3), b = G === 4 ? rnd(0, 2) : rnd(1, 3);
+  var askN = G === 4 ? rnd(5, 6) : G === 5 ? pick([10, 12, 15]) : 0, askTotal = 0, ans;
+  if (G === 6) { var nn = rnd(8, 20); askTotal = a * nn + b; ans = nn; } else ans = a * askN + b;
+  var figs = el("div", { class: "figs" });
+  for (var n = 1; n <= 3; n++) { var f = el("div", { class: "fig" }); f.innerHTML = figureSVG(n, a, b); f.appendChild(el("small", { text: "Figure " + n + " · " + (a * n + b) + " squares" })); figs.appendChild(f); }
+  var box = el("div", { class: "feedback", "aria-live": "polite" }), done = false, a2 = answerBox(check, "Your answer");
+  var rule = "Each figure adds " + a + " square" + (a > 1 ? "s" : "") + ". Squares = " + a + " × figure number" + (b ? " + " + b : "") + ".";
+  function check() { if (done) return; if (a2.input.value === "") { fb(box, "info", "Type your answer."); return; } done = true; var ok = +a2.input.value === ans; if (ok) bump("figures"); fb(box, ok ? "good" : "bad", (ok ? "Correct! " : "Not quite. The answer is " + ans + ". ") + rule); }
+  var q = G === 6 ? ["Which figure has ", el("b", { text: askTotal + " squares" }), "?"] : ["How many squares are in ", el("b", { text: "Figure " + askN }), "?"];
+  root.append(el("h2", { text: "Growing figures" }), el("p", { class: "howto", text: "Look at how each figure grows. Use the pattern rule instead of drawing every figure." }),
+    figs, el("p", { class: "prompt" }, q), el("div", { class: "row" }, [a2.node, el("button", { class: "btn", text: "Check", onclick: check }), el("button", { class: "btn ghost", text: "Next pattern", onclick: render }), scoreEl("figures")]), box);
+}
+
+// 5. Pattern table
+function gameTable(root) {
+  var G = state.grade, m = G === 4 ? pick([2, 3, 4, 5]) : rnd(2, 9), c = G === 4 ? 0 : rnd(0, 9);
+  if (G === 4) { var st = rnd(1, 9); c = st - m; if (c < 0) c = 0; }
+  var rows = [1, 2, 3, 4], tbl = el("table", { class: "pt" }), box = el("div", { class: "feedback", "aria-live": "polite" }), done = false;
+  var hr = el("tr", {}, [el("th", { text: "Term number" })].concat(rows.map(function (n) { return el("td", { text: String(n) }); })));
+  var vr = el("tr", {}, [el("th", { text: "Term value" })].concat(rows.map(function (n) { return el("td", { text: String(m * n + c) }); })));
+  tbl.append(hr, vr);
+  var body;
+  if (G === 6) {
+    var right = m + "n" + (c ? " + " + c : ""), opts = [right, (m + 1) + "n" + (c ? " + " + c : ""), "n + " + (m + c), m + "n + " + (c + m)];
+    opts = shuffle(opts.filter(function (o, i) { return opts.indexOf(o) === i; }));
+    var choices = el("div", { class: "choices" });
+    opts.forEach(function (o) { choices.appendChild(el("button", { class: "choice", text: o, onclick: function (e) {
+      if (done) return; done = true; var ok = o === right; e.target.classList.add(ok ? "right" : "wrong");
+      if (!ok) choices.querySelectorAll(".choice").forEach(function (b) { if (b.textContent === right) b.classList.add("right"); });
+      if (ok) bump("table");
+      fb(box, ok ? "good" : "bad", (ok ? "Correct! " : "Not quite. ") + "The value goes up by " + m + " each time, so it is " + m + " × n" + (c ? ", plus " + c : "") + ". Check with term 1: " + m + " × 1" + (c ? " + " + c : "") + " = " + (m + c) + ".");
+    } })); });
+    body = [el("p", { class: "prompt" }, ["Which expression gives the term value for term number ", el("b", { text: "n" }), "?"]), choices];
+  } else {
+    var askN = G === 4 ? 6 : 10, ans = m * askN + c, a = answerBox(check, "Term value");
+    function check() { if (done) return; if (a.input.value === "") { fb(box, "info", "Type the term value."); return; } done = true; var ok = +a.input.value === ans; if (ok) bump("table"); fb(box, ok ? "good" : "bad", (ok ? "Correct! " : "Not quite. Term " + askN + " is " + ans + ". ") + "The value goes up by " + m + " each time" + (c ? " and starts at " + (m + c) : "") + ". Term value = " + m + " × term number" + (c ? " + " + c : "") + "."); }
+    body = [el("p", { class: "prompt" }, ["What is the term value for ", el("b", { text: "term number " + askN }), "?"]), el("div", { class: "row" }, [a.node, el("button", { class: "btn", text: "Check", onclick: check })])];
+  }
+  root.append.apply(root, [el("h2", { text: "Pattern table" }), el("p", { class: "howto", text: "A table shows each term number with its value. Find how the value changes, then connect it to the term number." }), el("div", { class: "scroll" }, [tbl])].concat(body).concat([el("div", { class: "row" }, [el("button", { class: "btn ghost", text: "Next table", onclick: render }), scoreEl("table")]), box]));
+}
+
+var DRAW = { next: gameNext, rule: gameRule, missing: gameMissing, figures: gameFigures, table: gameTable };
+var main = document.getElementById("main");
+function render() {
+  document.querySelectorAll("[data-grade]").forEach(function (b) { b.setAttribute("aria-pressed", String(+b.dataset.grade === state.grade)); });
+  document.querySelectorAll("[data-game]").forEach(function (b) { b.setAttribute("aria-selected", String(b.dataset.game === state.game)); });
+  main.innerHTML = "";
+  var panel = el("section", { class: "panel", role: "tabpanel", "aria-labelledby": "t-" + state.game });
+  main.appendChild(panel); DRAW[state.game](panel);
+  var h = "g" + state.grade + "-" + state.game;
+  if (location.hash.slice(1) !== h) { try { history.replaceState(null, "", "#" + h); } catch (e) { location.hash = h; } }
+}
+function fromHash() { var m = /^#g([456])-([a-z]+)$/.exec(location.hash); if (m && GAMES.indexOf(m[2]) !== -1) { state.grade = +m[1]; state.game = m[2]; return true; } return false; }
+document.querySelectorAll("[data-grade]").forEach(function (b) { b.addEventListener("click", function () { state.grade = +b.dataset.grade; render(); }); });
+document.querySelectorAll("[data-game]").forEach(function (b) { b.addEventListener("click", function () { state.game = b.dataset.game; render(); }); });
+window.addEventListener("hashchange", function () { if (fromHash()) render(); });
+fromHash(); render();
+window.__pat = { term: term, ruleText: ruleText, makePattern: makePattern };
+})();
+</script>
+</body>
+</html>

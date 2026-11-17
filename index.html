@@ -61,6 +61,16 @@ main { padding: 12px 0 40px; display: grid; gap: 18px; }
 .items .plain .go { color: var(--muted); }
 .note { background: #fff; border: 2px dashed #b8c2bc; border-radius: 12px; padding: 12px 16px; color: var(--muted); font-size: 15px; }
 .note b { color: var(--ink); }
+.year { background: #fff; border: 2px solid var(--ink); border-radius: 14px; box-shadow: 5px 5px 0 var(--grid); }
+.year summary { cursor: pointer; padding: 12px 16px; font-family: var(--display); font-weight: 800; font-size: 20px; }
+.year .wrapt { overflow-x: auto; padding: 0 12px 12px; }
+.year table { border-collapse: collapse; width: 100%; font-size: 15px; font-variant-numeric: tabular-nums; }
+.year th, .year td { text-align: left; padding: 6px 10px; border-bottom: 1px solid #dfe5df; white-space: nowrap; }
+.year td.t { white-space: normal; }
+.year tr.now td { background: #fff4d6; font-weight: 700; }
+.year .st { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.year .st.done { color: #5d6b73; } .year .st.now { color: #b67c00; } .year .st.next { color: var(--accent); }
+.year p { margin: 0 16px 12px; color: var(--muted); font-size: 14px; }
 footer { color: var(--muted); font-size: 14px; padding-bottom: 30px; }
 @media (max-width: 520px) { .pickrow > span { min-width: 100%; } }
 </style>
@@ -92,7 +102,36 @@ var EDWIN = "https://go.edwin.app";
 var CLASS = { 4: ["Bennett6", "ODcyODAyODU0MTE0"], 5: ["Bennett5", "ODcyODAyNjMxODM3"], 6: ["Bennett6", "ODcyODAyODU0MTE0"] };
 var BLOCKS = [
   {
-    id: "b01", code: "B01", short: "Whole numbers", dates: "Oct 1\u20135", title: "Whole numbers: place value, estimating and comparing",
+    id: "b09", code: "B09", short: "Patterns", dates: "Oct 6–23", title: "Patterns: rules, tables and growing figures",
+    learn: {
+      4: [["Chapter 19: Patterns and Relationships", "Start here for the chapter overview", "/subjects/dbef76e5-a1f6-4eb2-87dc-dd1b1bb4c26c/units/6a7a8601761ce48c1ced1004"],
+          ["19.1 Repeating and Growing Patterns", "What repeats and what grows", "/subjects/dbef76e5-a1f6-4eb2-87dc-dd1b1bb4c26c/units/6a7a8601761ce48c1ced1004/ee209598-c49c-488d-8e7e-23416f041fdc"],
+          ["19.2 Determining and Using Pattern Rules", "Start number and what happens each time", "/subjects/dbef76e5-a1f6-4eb2-87dc-dd1b1bb4c26c/units/6a7a8601761ce48c1ced1004/9efce0fd-3a6e-4489-b3dd-c14a4dbe5c4c"]],
+      5: [["Chapter 17: Patterns and Algebraic Relationships", "Start here for the chapter overview", "/subjects/9d7986d8-338d-42b1-9e4f-6e720d9b4cd0/units/6a7da0ab5b7e8d78f682045e"],
+          ["17.1 Repeating, Growing, and Shrinking Patterns", "Patterns that grow and shrink", "/subjects/9d7986d8-338d-42b1-9e4f-6e720d9b4cd0/units/6a7da0ab5b7e8d78f682045e/38a25d0a-5610-4a23-a114-6c3094b0a787"],
+          ["17.2 Determining and Using Pattern Rules", "Rules, tables and the next terms", "/subjects/9d7986d8-338d-42b1-9e4f-6e720d9b4cd0/units/6a7da0ab5b7e8d78f682045e/e7cfc374-a5be-4d21-a11b-73f16ec27869"]],
+      6: [["Chapter 16: Patterns", "Start here for the chapter overview", "/subjects/293cd14f-01b6-4dea-a9d8-84a3124817eb/units/6a7be79a1592c0cbee3b42c6"],
+          ["16.1 Identifying and Describing Patterns", "Describe how a pattern changes", "/subjects/293cd14f-01b6-4dea-a9d8-84a3124817eb/units/6a7be79a1592c0cbee3b42c6/b85b3088-30fc-4e6d-b305-92bf807414ba"],
+          ["16.2 Creating and Translating Patterns", "Pictures, tables and graphs", "/subjects/293cd14f-01b6-4dea-a9d8-84a3124817eb/units/6a7be79a1592c0cbee3b42c6/d99de6d7-98b9-4133-9b3b-d2ea00d846a0"],
+          ["16.3 Determining and Using Pattern Rules", "Rules and expressions", "/subjects/293cd14f-01b6-4dea-a9d8-84a3124817eb/units/6a7be79a1592c0cbee3b42c6/49cc3774-532a-440f-8214-dc3f2acb80f3"],
+          ["Chapter 16 Wrap Up", "Review the chapter and try the Progress Check", "/subjects/293cd14f-01b6-4dea-a9d8-84a3124817eb/units/6a7be79a1592c0cbee3b42c6/4f8dc0cd-303e-4aa9-8fff-839573e58a3f"]]
+    },
+    workbook: { 4: "(in each lesson)", 5: "(in each lesson)", 6: "(in each lesson)" },
+    quiz: { 5: "874270988110" },
+    level4: [5, 6],
+    lab: "pattern-lab.html", labName: "Pattern Lab",
+    hands: function (G) { return [
+      ["Pattern blocks", "Edwin's virtual pattern blocks. Build a growing pattern and describe the rule.", EDWIN + "/interactive-tools", "Edwin →"],
+      ["Growing figures", "Watch figures grow and predict later ones in Pattern Lab", "pattern-lab.html#g" + G + "-figures", "Open →"],
+      ["Build it with tiles", "Build Figures 1 to 4 with square tiles at the hands-on table and record them in a table", null, "In class"]]; },
+    games: [["next", "What comes next?", "Find the next term"],
+            ["rule", "Find the rule", "Start number and what happens each time"],
+            ["missing", "Missing term", "Fill the gap in the pattern"],
+            ["figures", "Growing figures", "Predict a later figure"],
+            ["table", "Pattern table", "Connect term number and value"]]
+  },
+  {
+    id: "b01", code: "B01", short: "Whole numbers", dates: "Oct 27 \u2013 Nov 11", title: "Whole numbers: place value, estimating and comparing",
     learn: {
       4: [["Chapter 1: Numbers to 10 000", "Start here for the chapter overview", "/subjects/dbef76e5-a1f6-4eb2-87dc-dd1b1bb4c26c/units/6a32edbaee7195a2200d549f"],
           ["1.2 Place Value", "Thousands, hundreds, tens and ones", "/subjects/dbef76e5-a1f6-4eb2-87dc-dd1b1bb4c26c/units/6a32edbaee7195a2200d549f/c11baab9-9b86-42c7-832f-092925bf7928"],
@@ -121,7 +160,7 @@ var BLOCKS = [
             ["order", "Order up", "Put numbers in order"]]
   },
   {
-    id: "angles", code: "B02", short: "Angles", dates: "Oct 6\u201315 \u00b7 7 lessons", title: "Angles: identifying, measuring and finding unknown angles",
+    id: "angles", code: "B02", short: "Angles", dates: "Nov 12\u201323 \u00b7 7 lessons", title: "Angles: identifying, measuring and finding unknown angles",
     learn: {
       4: [["Chapter 15: Angles and Lines", "Start here for the chapter overview", "/subjects/dbef76e5-a1f6-4eb2-87dc-dd1b1bb4c26c/units/6a753295bd9d2b1a513fe13d"],
           ["15.1 Identifying Angles", "Acute, right, obtuse and straight angles", "/subjects/dbef76e5-a1f6-4eb2-87dc-dd1b1bb4c26c/units/6a753295bd9d2b1a513fe13d/0fe472fa-7298-4250-8830-8c199c827afb"],
@@ -162,6 +201,9 @@ var BLOCKS = [
 
 // The block students see first: change this when the class moves on.
 var CURRENT = "angles";
+function quizUrl(B, G) { return B.quiz[G] ? "https://classroom.google.com/c/" + CLASS[G][1] + "/a/" + btoa(B.quiz[G]) + "/details" : "https://classroom.google.com/w/" + CLASS[G][1] + "/t/all"; }
+// Whole-year plan (re-dated Nov 17, 2026). [block, title, first day, last day]
+var YEAR = [["Start", "First 20 days", "2026-09-08", "2026-10-05"], ["B09", "Patterns", "2026-10-06", "2026-10-23"], ["B01", "Whole numbers: place value, estimating and comparing", "2026-10-27", "2026-11-11"], ["B02", "Angles", "2026-11-12", "2026-11-23"], ["B03", "Collecting, organizing and describing data", "2026-11-24", "2026-11-27"], ["B04", "Fractions: representing, comparing and ordering", "2026-11-30", "2026-12-07"], ["B05", "Decimal numbers", "2026-12-08", "2026-12-14"], ["B06", "Probability", "2026-12-15", "2027-01-04"], ["B07", "Integers", "2027-01-05", "2027-01-07"], ["B08", "Location and transformations", "2027-01-08", "2027-01-15"], ["B10", "Adding and subtracting whole numbers", "2027-01-18", "2027-01-20"], ["B11", "Factors, primes and divisibility", "2027-01-21", "2027-01-28"], ["B12", "Shapes, objects and coding", "2027-01-29", "2027-02-05"], ["B13", "Estimating and comparing decimals", "2027-02-08", "2027-02-10"], ["B14", "Decimal operations", "2027-02-11", "2027-02-19"], ["B15", "Multiplying and dividing decimals", "2027-02-22", "2027-03-01"], ["B16", "Area", "2027-03-02", "2027-03-04"], ["B17", "Algebra: expressions and equations", "2027-03-05", "2027-03-23"], ["B18", "Rates, ratios and percent", "2027-03-24", "2027-04-02"], ["B19", "Percent", "2027-04-05", "2027-04-09"], ["B20", "Whole-number operations", "2027-04-12", "2027-04-19"], ["B21", "Dividing whole numbers", "2027-04-20", "2027-04-28"], ["B22", "Surface area", "2027-04-29", "2027-05-04"], ["B23", "Classifying triangles", "2027-05-05", "2027-05-07"], ["B24", "Displaying and interpreting data", "2027-05-10", "2027-05-17"], ["B25", "Coding", "2027-05-18", "2027-05-20"], ["B26", "Financial literacy", "2027-05-21", "2027-05-28"], ["B27", "Area relationships", "2027-05-31", "2027-06-02"], ["B28", "Fraction operations", "2027-06-03", "2027-06-09"], ["B29", "Solving equations and inequalities", "2027-06-10", "2027-06-17"], ["B30", "Operations with fractions and whole numbers", "2027-06-18", "2027-06-24"], ["B31", "Length, mass and capacity", "2027-06-25", "2027-06-29"]];
 var state = { grade: null, block: CURRENT };
 try { var g = localStorage.getItem("hub-grade"); if (g) state.grade = +g; } catch (e) {}
 var m = /^#g([456])(?:-([a-z0-9]+))?$/.exec(location.hash);
@@ -183,6 +225,17 @@ function step(n, name, what, colour, items) {
     el("ul", { class: "items" }, items)
   ]);
 }
+function yearSection() {
+  var today = new Date().toISOString().slice(0, 10);
+  var nice = function (d) { return new Date(d + "T12:00:00").toLocaleDateString("en-CA", { month: "short", day: "numeric" }); };
+  var rows = YEAR.map(function (r) {
+    var st = today > r[3] ? ["done", "Done"] : today >= r[2] ? ["now", "Now"] : ["next", "Coming up"];
+    return el("tr", { class: st[0] === "now" ? "now" : "" }, [el("td", { text: r[0] }), el("td", { class: "t", text: r[1] }), el("td", { text: nice(r[2]) + " \u2013 " + nice(r[3]) }), el("td", {}, [el("span", { class: "st " + st[0], text: st[1] })])]);
+  });
+  return el("details", { class: "year" }, [el("summary", { text: "This year in math: every block and its dates" }),
+    el("p", { text: "Dates are approximate and may shift with school events." }),
+    el("div", { class: "wrapt" }, [el("table", {}, [el("thead", {}, [el("tr", {}, [el("th", { text: "Block" }), el("th", { text: "Topic" }), el("th", { text: "Dates" }), el("th", { text: "" })])]), el("tbody", {}, rows)])])]);
+}
 function render() {
   document.querySelectorAll("[data-grade]").forEach(function (b) { b.setAttribute("aria-pressed", String(+b.dataset.grade === state.grade)); });
   var bp = document.getElementById("blockpicks");
@@ -191,7 +244,7 @@ function render() {
     bp.appendChild(el("button", { class: "pill", "aria-pressed": String(b.id === state.block), onclick: function () { state.block = b.id; render(); } }, [b.code, b.short ? el("small", { text: " " + b.short }) : null]));
   });
   var main = document.getElementById("main"); main.innerHTML = "";
-  if (!state.grade) { main.appendChild(el("p", { class: "note" }, [el("b", { text: "Pick your grade above " }), "to see your practice for this block."])); return; }
+  if (!state.grade) { main.appendChild(el("p", { class: "note" }, [el("b", { text: "Pick your grade above " }), "to see your practice for this block."])); main.appendChild(yearSection()); return; }
   var B = BLOCKS.filter(function (b) { return b.id === state.block; })[0], G = state.grade;
   main.appendChild(el("div", { class: "blockhead" }, [el("h2", { text: B.code + " · " + B.title }), el("span", { class: "tag", text: "Grade " + G + (B.dates ? " \u00b7 " + B.dates : "") })]));
   var steps = el("div", { class: "steps" });
@@ -205,12 +258,16 @@ function render() {
     step(3, "Play", B.labName + " games", "--play", B.games.map(function (gm) { return item(gm[1], gm[2], B.lab + "#g" + G + "-" + gm[0], "Play \u2192"); })),
     step(4, "Hands-on", "Use a math tool", "--hands", B.hands(G).map(function (h) { return item(h[0], h[1], h[2], h[3]); })),
     step(5, "Check", "Show your teacher", "--check", [
-      item(B.code + " quiz", "Opens your quiz in your " + CLASS[G][0] + " Google Classroom. Use your school account.", "https://classroom.google.com/c/" + CLASS[G][1] + "/a/" + btoa(B.quiz[G]) + "/details", "Classroom \u2192"),
-      item("Wrong account?", "Quiz not found? Choose your school account, then it opens the quiz.", "https://accounts.google.com/AccountChooser?continue=" + encodeURIComponent("https://classroom.google.com/c/" + CLASS[G][1] + "/a/" + btoa(B.quiz[G]) + "/details"), "Choose \u2192"),
-      item("Level 4 challenge", "Finished the quiz? Open the challenge sheet, then ask your teacher for a paper copy to write on.", "level4-" + B.code + "-grade" + G + ".pdf", "Open \u2192")
+      B.quiz[G] ? item(B.code + " quiz", "Opens your quiz in your " + CLASS[G][0] + " Google Classroom. Use your school account.", quizUrl(B, G), "Classroom \u2192")
+                : item(B.code + " quiz", "Find your quiz in your " + CLASS[G][0] + " Google Classroom, under Math.", "https://classroom.google.com/w/" + CLASS[G][1] + "/t/all", "Classroom \u2192"),
+      item("Wrong account?", "Quiz not found? Choose your school account, then it opens the quiz.", "https://accounts.google.com/AccountChooser?continue=" + encodeURIComponent(quizUrl(B, G)), "Choose \u2192"),
+      (!B.level4 || B.level4.indexOf(G) !== -1)
+        ? item("Level 4 challenge", "Finished the quiz? Open the challenge sheet, then ask your teacher for a paper copy to write on.", "level4-" + B.code + "-grade" + G + ".pdf", "Open \u2192")
+        : item("Level 4 challenge", "Finished the quiz? Ask your teacher for the Level 4 challenge.", null, "Ask your teacher")
     ])
   );
   main.appendChild(steps);
+  main.appendChild(yearSection());
   var h = "g" + G + "-" + state.block;
   if (location.hash.slice(1) !== h) { try { history.replaceState(null, "", "#" + h); } catch (e) {} }
 }
